@@ -1,0 +1,26 @@
+.transactions-container {
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 24px;
+  color: #2d3748;
+  font-size: 24px;
+}
+
+table {
+  width: 100%;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  background: #f7fafc;
+  border-radius: 8px;
+  color: #a0aec0;
+}
+
+.no-data p {
+  margin: 0;
+  font-style: italic;
+}

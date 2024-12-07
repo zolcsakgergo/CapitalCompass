@@ -21,6 +21,9 @@
   background-color: white;
   border-right: none;
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 mat-toolbar {
@@ -51,6 +54,7 @@ mat-sidenav-content {
 
 mat-nav-list {
   padding-top: 0;
+  flex: 1;
 }
 
 .active {
@@ -65,11 +69,16 @@ a[mat-list-item] {
   height: 48px;
 }
 
+.sidenav-footer {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .logout-button {
-  position: fixed;
-  bottom: 32px;
-  right: 32px;
-  z-index: 1000;
+  position: relative;
+  margin-bottom: 16px;
+  margin-right: 16px;
   transition: transform 0.2s ease;
 }
 
@@ -82,9 +91,8 @@ a[mat-list-item] {
 }
 
 @media (max-width: 768px) {
-  .logout-button {
-    bottom: 16px;
-    right: 16px;
+  .sidenav-footer {
+    padding: 12px;
   }
 
   mat-toolbar {

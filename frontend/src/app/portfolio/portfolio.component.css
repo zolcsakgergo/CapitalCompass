@@ -1,0 +1,23 @@
+mat-sidenav-container {
+  height: 100vh;
+}
+
+mat-sidenav {
+  width: 250px;
+  padding: 16px;
+}
+
+.mat-icon {
+  margin-right: 16px;
+}
+
+.logout-button {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.active {
+  background: rgba(0, 0, 0, 0.04);
+}

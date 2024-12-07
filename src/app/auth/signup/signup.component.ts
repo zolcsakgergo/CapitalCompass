@@ -6,12 +6,14 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDialogRef, MatDialog } from '@angular/material/dialog';
+import { LoginComponent } from '../login/login.component';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -20,7 +22,6 @@ import { AuthService } from '../auth.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -35,12 +36,13 @@ export class SignupComponent {
   isLoading = false;
   error = '';
   success = '';
-  errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
+    private dialogRef: MatDialogRef<SignupComponent>,
+    private dialog: MatDialog,
   ) {
     this.signupForm = this.fb.group({
       firstName: ['', [Validators.required]],
@@ -68,9 +70,7 @@ export class SignupComponent {
           console.log('Registration successful:', response);
           this.success = 'Registration successful! Redirecting to login...';
           this.error = '';
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 2000);
+          this.dialogRef.close(true);
         },
         error: err => {
           console.error('Registration failed:', err);
@@ -84,5 +84,15 @@ export class SignupComponent {
         },
       });
     }
+  }
+
+  openLogin() {
+    this.dialogRef.close();
+    this.dialog.open(LoginComponent, {
+      width: '400px',
+      panelClass: 'auth-dialog',
+      backdropClass: 'auth-dialog-backdrop',
+      disableClose: false,
+    });
   }
 }

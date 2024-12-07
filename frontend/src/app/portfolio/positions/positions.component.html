@@ -1,0 +1,122 @@
+<div class="positions-container">
+  <div class="table-container">
+    <table mat-table [dataSource]="dataSource" class="positions-table">
+      <!-- Stock Name Column -->
+      <ng-container matColumnDef="Stock Name">
+        <th mat-header-cell *matHeaderCellDef>Stock Name</th>
+        <td mat-cell *matCellDef="let position">{{ position.stockName }}</td>
+      </ng-container>
+
+      <!-- Symbol Column -->
+      <ng-container matColumnDef="Symbol">
+        <th mat-header-cell *matHeaderCellDef>Symbol</th>
+        <td mat-cell *matCellDef="let position">{{ position.symbol }}</td>
+      </ng-container>
+
+      <!-- Shares Column -->
+      <ng-container matColumnDef="Shares">
+        <th mat-header-cell *matHeaderCellDef>Shares</th>
+        <td mat-cell *matCellDef="let position">{{ position.shares }}</td>
+      </ng-container>
+
+      <!-- Date Acquired Column -->
+      <ng-container matColumnDef="Date Acquired">
+        <th mat-header-cell *matHeaderCellDef>Date Acquired</th>
+        <td mat-cell *matCellDef="let position">{{ position.dateAcquired }}</td>
+      </ng-container>
+
+      <!-- Type Column -->
+      <ng-container matColumnDef="Type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let position">{{ position.type }}</td>
+      </ng-container>
+
+      <!-- Purchase Price Column -->
+      <ng-container matColumnDef="Purchase Price">
+        <th mat-header-cell *matHeaderCellDef>Purchase Price</th>
+        <td mat-cell *matCellDef="let position">
+          ${{ position.purchasePrice | number: '1.2-2' }}
+        </td>
+      </ng-container>
+
+      <!-- Current Price Column -->
+      <ng-container matColumnDef="Current Price">
+        <th mat-header-cell *matHeaderCellDef>Current Price</th>
+        <td mat-cell *matCellDef="let position">
+          ${{ position.currentPrice | number: '1.2-2' }}
+        </td>
+      </ng-container>
+
+      <!-- Current Value Column -->
+      <ng-container matColumnDef="Current Value">
+        <th mat-header-cell *matHeaderCellDef>Current Value</th>
+        <td mat-cell *matCellDef="let position">
+          ${{ position.currentValue | number: '1.2-2' }}
+        </td>
+      </ng-container>
+
+      <!-- Change Column -->
+      <ng-container matColumnDef="Change">
+        <th mat-header-cell *matHeaderCellDef>Change</th>
+        <td
+          mat-cell
+          *matCellDef="let position"
+          [ngClass]="{
+            positive: position.change > 0,
+            negative: position.change < 0,
+          }"
+        >
+          {{ position.change | number: '1.2-2' }}%
+        </td>
+      </ng-container>
+
+      <!-- Daily Change Column -->
+      <ng-container matColumnDef="Daily Change">
+        <th mat-header-cell *matHeaderCellDef>Daily Change</th>
+        <td
+          mat-cell
+          *matCellDef="let position"
+          [ngClass]="{
+            positive: position.dailyChange > 0,
+            negative: position.dailyChange < 0,
+          }"
+        >
+          {{ position.dailyChange | number: '1.2-2' }}%
+        </td>
+      </ng-container>
+
+      <!-- YTD Change Column -->
+      <ng-container matColumnDef="YTD Change">
+        <th mat-header-cell *matHeaderCellDef>YTD Change</th>
+        <td
+          mat-cell
+          *matCellDef="let position"
+          [ngClass]="{
+            positive: position.ytdChange > 0,
+            negative: position.ytdChange < 0,
+          }"
+        >
+          {{ position.ytdChange | number: '1.2-2' }}%
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let position">
+          <button
+            mat-icon-button
+            color="warn"
+            (click)="deletePosition(position.id)"
+            matTooltip="Delete position"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+</div>

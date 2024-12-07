@@ -1,7 +1,10 @@
 <div class="landing-container">
-  <nav class="navbar">
-    <button class="login-button" (click)="navigateToLogin()">Login</button>
-  </nav>
+  <mat-toolbar class="navbar">
+    <span class="spacer"></span>
+    <button mat-raised-button color="primary" (click)="openLoginDialog()">
+      Login
+    </button>
+  </mat-toolbar>
 
   <main class="hero-section">
     <div class="content">
@@ -11,29 +14,39 @@
       </p>
 
       <div class="cta-buttons">
-        <button class="primary-button" (click)="navigateToSignup()">Get Started</button>
-        <button class="secondary-button" (click)="learnMore()">Learn More</button>
+        <button mat-raised-button color="primary" (click)="openSignupDialog()">
+          Get Started
+        </button>
+        <button mat-stroked-button color="primary" (click)="learnMore()">
+          Learn More
+        </button>
       </div>
     </div>
 
     <div class="features">
-      <div class="feature-card">
-        <div class="feature-icon">📊</div>
-        <h3>Portfolio Tracking</h3>
-        <p>Monitor all your investments in one place</p>
-      </div>
+      <mat-card class="feature-card">
+        <mat-card-content>
+          <div class="feature-icon">📊</div>
+          <mat-card-title>Portfolio Tracking</mat-card-title>
+          <p>Monitor all your investments in one place</p>
+        </mat-card-content>
+      </mat-card>
 
-      <div class="feature-card">
-        <div class="feature-icon">📈</div>
-        <h3>Performance Analytics</h3>
-        <p>Detailed insights into your returns</p>
-      </div>
+      <mat-card class="feature-card">
+        <mat-card-content>
+          <div class="feature-icon">📈</div>
+          <mat-card-title>Performance Analytics</mat-card-title>
+          <p>Detailed insights into your returns</p>
+        </mat-card-content>
+      </mat-card>
 
-      <div class="feature-card">
-        <div class="feature-icon">🔒</div>
-        <h3>Secure Platform</h3>
-        <p>Your data is always protected</p>
-      </div>
+      <mat-card class="feature-card">
+        <mat-card-content>
+          <div class="feature-icon">🔒</div>
+          <mat-card-title>Secure Platform</mat-card-title>
+          <p>Your data is always protected</p>
+        </mat-card-content>
+      </mat-card>
     </div>
   </main>
 </div>

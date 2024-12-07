@@ -12,7 +12,8 @@ import {
   RouterOutlet,
   Router,
 } from '@angular/router';
-import { AuthService } from '../auth/auth.service';
+import { PositionsComponent } from './positions/positions.component';
+import { AuthService } from '../../../../src/app/auth/auth.service';
 
 @Component({
   selector: 'app-portfolio',
@@ -30,7 +31,7 @@ import { AuthService } from '../auth/auth.service';
     RouterOutlet,
   ],
   templateUrl: './portfolio.component.html',
-  styleUrls: ['./portfolio.component.css'],
+  styleUrl: './portfolio.component.css',
 })
 export class PortfolioComponent {
   constructor(

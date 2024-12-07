@@ -1,0 +1,58 @@
+<div class="dashboard-container">
+  <h1>Portfolio Overview</h1>
+  <div class="dashboard-grid">
+    <mat-card>
+      <mat-card-header>
+        <mat-icon>account_balance</mat-icon>
+        <mat-card-title>Total Value</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2 *ngIf="totalValue !== null">{{ totalValue | currency }}</h2>
+        <p *ngIf="totalValue === null" class="no-data">No data available</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-icon>show_chart</mat-icon>
+        <mat-card-title>Total Positions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2 *ngIf="totalPositions !== null">{{ totalPositions }}</h2>
+        <p *ngIf="totalPositions === null" class="no-data">No data available</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-icon>trending_up</mat-icon>
+        <mat-card-title>Today's Change</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2
+          *ngIf="dailyChange !== null"
+          [class]="dailyChange >= 0 ? 'positive' : 'negative'"
+        >
+          {{ dailyChange >= 0 ? '+' : '' }}{{ dailyChange | number: '1.2-2' }}%
+        </h2>
+        <p *ngIf="dailyChange === null" class="no-data">No data available</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-icon>calendar_today</mat-icon>
+        <mat-card-title>YTD Change</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2
+          *ngIf="ytdChange !== null"
+          [class]="ytdChange >= 0 ? 'positive' : 'negative'"
+        >
+          {{ ytdChange >= 0 ? '+' : '' }}{{ ytdChange | number: '1.2-2' }}%
+        </h2>
+        <p *ngIf="ytdChange === null" class="no-data">No data available</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
