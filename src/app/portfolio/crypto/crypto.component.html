@@ -1,0 +1,134 @@
+<div class="crypto-container">
+  <h1>Cryptocurrency Portfolio</h1>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Your Crypto Assets</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="cryptos.length === 0" class="no-data">
+        <p>No cryptocurrencies added yet.</p>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="openAddCryptoDialog()"
+        >
+          <mat-icon>add</mat-icon>
+          Add Crypto
+        </button>
+      </div>
+
+      <table mat-table [dataSource]="cryptos" *ngIf="cryptos.length > 0">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let crypto">{{ crypto.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="symbol">
+          <th mat-header-cell *matHeaderCellDef>Symbol</th>
+          <td mat-cell *matCellDef="let crypto">{{ crypto.symbol }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="amount">
+          <th mat-header-cell *matHeaderCellDef>Amount</th>
+          <td mat-cell *matCellDef="let crypto">{{ crypto.amount }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="purchasePrice">
+          <th mat-header-cell *matHeaderCellDef>Total Cost</th>
+          <td mat-cell *matCellDef="let crypto">
+            {{ crypto.purchasePrice | currency }}
+            <div class="price-hint">
+              ({{ crypto.purchasePrice / crypto.amount | currency }}/{{
+                crypto.symbol
+              }})
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="currentPrice">
+          <th mat-header-cell *matHeaderCellDef>Current Value</th>
+          <td mat-cell *matCellDef="let crypto">
+            {{ crypto.currentPrice * crypto.amount | currency }}
+            <div class="price-hint">
+              ({{ crypto.currentPrice | currency }}/{{ crypto.symbol }})
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="totalChange">
+          <th mat-header-cell *matHeaderCellDef>Total Change</th>
+          <td
+            mat-cell
+            *matCellDef="let crypto"
+            [class]="crypto.totalChange >= 0 ? 'positive' : 'negative'"
+          >
+            {{ crypto.totalChange >= 0 ? '+' : ''
+            }}{{ crypto.totalChange | number: '1.2-2' }}%
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let crypto">
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="deleteCrypto(crypto.id)"
+              title="Delete"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="[
+            'name',
+            'symbol',
+            'amount',
+            'purchasePrice',
+            'currentPrice',
+            'totalChange',
+            'actions',
+          ]"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="
+            let row;
+            columns: [
+              'name',
+              'symbol',
+              'amount',
+              'purchasePrice',
+              'currentPrice',
+              'totalChange',
+              'actions',
+            ]
+          "
+        ></tr>
+      </table>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="openAddCryptoDialog()"
+        *ngIf="cryptos.length > 0"
+        class="add-button"
+      >
+        <mat-icon>add</mat-icon>
+        Add Crypto
+      </button>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<style>
+  .price-hint {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 4px;
+  }
+</style>

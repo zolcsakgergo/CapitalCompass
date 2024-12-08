@@ -2,7 +2,7 @@
   <mat-toolbar class="navbar">
     <span class="spacer"></span>
     <button mat-raised-button color="primary" (click)="openLoginDialog()">
-      Login
+      {{ isLoggedIn ? 'My Portfolio' : 'Login' }}
     </button>
   </mat-toolbar>
 
@@ -15,7 +15,7 @@
 
       <div class="cta-buttons">
         <button mat-raised-button color="primary" (click)="openSignupDialog()">
-          Get Started
+          {{ isLoggedIn ? 'Go to Portfolio' : 'Get Started' }}
         </button>
         <button mat-stroked-button color="primary" (click)="learnMore()">
           Learn More

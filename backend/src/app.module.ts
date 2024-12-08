@@ -1,24 +1,40 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_PIPE } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
+import { CryptoModule } from './crypto/crypto.module';
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { PositionsModule } from './positions/positions.module';
-import { Position } from './positions/entities/position.entity';
-import { User } from './users/user.entity';
+import { StocksModule } from './stocks/stocks.module';
+import { TwelveDataModule } from './twelve-data/twelve-data.module';
+import { Crypto } from './crypto/entities/crypto.entity';
+import { User } from './auth/entities/user.entity';
+import { Stock } from './stocks/entities/stock.entity';
+import { join } from 'path';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'db.sqlite',
-      entities: [User, Position],
+      database: join(__dirname, '..', 'db.sqlite'),
+      entities: [User, Crypto, Stock],
       synchronize: true,
     }),
+    CryptoModule,
     AuthModule,
-    UsersModule,
-    PositionsModule,
+    StocksModule,
+    TwelveDataModule,
+  ],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+        transform: true,
+      }),
+    },
   ],
 })
 export class AppModule {}

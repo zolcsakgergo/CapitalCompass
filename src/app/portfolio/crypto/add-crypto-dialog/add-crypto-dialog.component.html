@@ -1,0 +1,91 @@
+<!-- Dialog Title -->
+<h2 mat-dialog-title>Add Cryptocurrency</h2>
+
+<!-- Dialog Content -->
+<mat-dialog-content>
+  <form #cryptoForm="ngForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Name</mat-label>
+      <input
+        matInput
+        [(ngModel)]="crypto.name"
+        name="name"
+        required
+        placeholder="e.g., Bitcoin"
+      />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Symbol</mat-label>
+      <input
+        matInput
+        [(ngModel)]="crypto.symbol"
+        name="symbol"
+        required
+        placeholder="e.g., BTC"
+        pattern="[A-Z]+"
+      />
+      <mat-hint>Enter the symbol in uppercase (e.g., BTC for Bitcoin)</mat-hint>
+      <mat-error *ngIf="cryptoForm.form.get('symbol')?.hasError('pattern')">
+        Symbol must be in uppercase letters only
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Amount</mat-label>
+      <input
+        matInput
+        type="number"
+        [(ngModel)]="crypto.amount"
+        name="amount"
+        required
+        min="0"
+        step="any"
+      />
+      <mat-hint>Enter the amount of cryptocurrency you purchased</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Total Purchase Price (USD)</mat-label>
+      <input
+        matInput
+        type="number"
+        [(ngModel)]="crypto.purchasePrice"
+        name="purchasePrice"
+        required
+        min="0"
+        step="any"
+      />
+      <mat-hint>Enter the total amount you spent in USD</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Purchase Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        [(ngModel)]="crypto.purchaseDate"
+        name="purchaseDate"
+        required
+      />
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<!-- Dialog Actions -->
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="!cryptoForm.form.valid"
+  >
+    Add
+  </button>
+</mat-dialog-actions>

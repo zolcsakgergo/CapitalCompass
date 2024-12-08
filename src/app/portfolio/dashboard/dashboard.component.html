@@ -1,58 +1,105 @@
 <div class="dashboard-container">
-  <h1>Portfolio Overview</h1>
-  <div class="dashboard-grid">
-    <mat-card>
+  <h1>Portfolio Dashboard</h1>
+
+  <!-- Overview Cards -->
+  <div class="overview-grid">
+    <!-- Portfolio Value Card -->
+    <mat-card class="overview-card">
       <mat-card-header>
         <mat-icon>account_balance</mat-icon>
-        <mat-card-title>Total Value</mat-card-title>
+        <mat-card-title>Portfolio Value</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <h2 *ngIf="totalValue !== null">{{ totalValue | currency }}</h2>
-        <p *ngIf="totalValue === null" class="no-data">No data available</p>
+        <div class="value-content">
+          <h2>{{ totalValue | currency }}</h2>
+          <div
+            class="change-info"
+            [ngClass]="totalChangePercent >= 0 ? 'positive' : 'negative'"
+          >
+            <span>{{ totalChangePercent | number: '1.2-2' }}%</span>
+            <mat-icon>{{
+              totalChangePercent >= 0 ? 'arrow_upward' : 'arrow_downward'
+            }}</mat-icon>
+          </div>
+          <mat-form-field>
+            <mat-label>Interval</mat-label>
+            <mat-select
+              [(ngModel)]="selectedInterval"
+              (selectionChange)="updatePerformance()"
+            >
+              <mat-option value="1d">1 Day</mat-option>
+              <mat-option value="1w">1 Week</mat-option>
+              <mat-option value="1m">1 Month</mat-option>
+              <mat-option value="1y">1 Year</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
       </mat-card-content>
     </mat-card>
 
-    <mat-card>
+    <!-- Total Positions Card -->
+    <mat-card class="overview-card">
       <mat-card-header>
         <mat-icon>show_chart</mat-icon>
         <mat-card-title>Total Positions</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <h2 *ngIf="totalPositions !== null">{{ totalPositions }}</h2>
-        <p *ngIf="totalPositions === null" class="no-data">No data available</p>
+        <div class="positions-content">
+          <h2>{{ totalPositions }}</h2>
+          <div class="positions-breakdown">
+            <div class="breakdown-item">
+              <mat-icon>trending_up</mat-icon>
+              <span>{{ stocksCount }} Stocks</span>
+            </div>
+            <div class="breakdown-item">
+              <mat-icon>currency_bitcoin</mat-icon>
+              <span>{{ cryptoCount }} Crypto</span>
+            </div>
+          </div>
+        </div>
       </mat-card-content>
     </mat-card>
 
-    <mat-card>
+    <!-- Best Performing Asset Card -->
+    <mat-card class="overview-card">
       <mat-card-header>
-        <mat-icon>trending_up</mat-icon>
-        <mat-card-title>Today's Change</mat-card-title>
+        <mat-icon>stars</mat-icon>
+        <mat-card-title>Best Performer</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <h2
-          *ngIf="dailyChange !== null"
-          [class]="dailyChange >= 0 ? 'positive' : 'negative'"
-        >
-          {{ dailyChange >= 0 ? '+' : '' }}{{ dailyChange | number: '1.2-2' }}%
-        </h2>
-        <p *ngIf="dailyChange === null" class="no-data">No data available</p>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
-      <mat-card-header>
-        <mat-icon>calendar_today</mat-icon>
-        <mat-card-title>YTD Change</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <h2
-          *ngIf="ytdChange !== null"
-          [class]="ytdChange >= 0 ? 'positive' : 'negative'"
-        >
-          {{ ytdChange >= 0 ? '+' : '' }}{{ ytdChange | number: '1.2-2' }}%
-        </h2>
-        <p *ngIf="ytdChange === null" class="no-data">No data available</p>
+        <div class="performer-content" *ngIf="bestPerformer">
+          <h3>{{ bestPerformer.name }}</h3>
+          <div class="change-info positive">
+            <span>{{ bestPerformer.changePercent | number: '1.2-2' }}%</span>
+            <mat-icon>arrow_upward</mat-icon>
+          </div>
+          <p class="asset-type">{{ bestPerformer.type }}</p>
+        </div>
+        <p *ngIf="!bestPerformer" class="no-data">No assets yet</p>
       </mat-card-content>
     </mat-card>
   </div>
+
+  <!-- Chart Section -->
+  <mat-card class="chart-card">
+    <mat-card-header>
+      <mat-card-title>Portfolio Analysis</mat-card-title>
+      <mat-form-field>
+        <mat-label>Chart Type</mat-label>
+        <mat-select
+          [(ngModel)]="selectedChartType"
+          (selectionChange)="updateChart()"
+        >
+          <mat-option value="pie">Asset Distribution (Pie)</mat-option>
+          <mat-option value="bar">Asset Comparison (Bar)</mat-option>
+          <mat-option value="line">Portfolio Growth (Line)</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="chart-container">
+        <canvas #chartCanvas></canvas>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>

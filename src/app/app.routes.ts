@@ -5,9 +5,10 @@ import { PortfolioComponent } from './portfolio/portfolio.component';
 import { LandingComponent } from './landing/landing.component';
 import { AccessDeniedComponent } from './access-denied/access-denied.component';
 import { DashboardComponent } from './portfolio/dashboard/dashboard.component';
-import { PositionsComponent } from './portfolio/positions/positions.component';
 import { TransactionsComponent } from './portfolio/transactions/transactions.component';
 import { authGuard } from './auth/auth.guard';
+import { StocksComponent } from './portfolio/stocks/stocks.component';
+import { CryptoComponent } from './portfolio/crypto/crypto.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -18,7 +19,8 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', component: DashboardComponent },
-      { path: 'positions', component: PositionsComponent },
+      { path: 'stocks', component: StocksComponent },
+      { path: 'crypto', component: CryptoComponent },
       { path: 'transactions', component: TransactionsComponent },
     ],
   },

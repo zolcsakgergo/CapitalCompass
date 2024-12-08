@@ -11,7 +11,7 @@ interface AuthResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:3000/auth';
+  private readonly API_URL = 'http://localhost:3000/api/auth';
 
   constructor(private http: HttpClient) {}
 
@@ -33,7 +33,12 @@ export class AuthService {
     firstName: string;
     lastName: string;
   }): Observable<any> {
-    return this.http.post(`${this.API_URL}/register`, userData);
+    const registerData = {
+      email: userData.email,
+      password: userData.password,
+      name: `${userData.firstName} ${userData.lastName}`,
+    };
+    return this.http.post(`${this.API_URL}/register`, registerData);
   }
 
   logout(): void {

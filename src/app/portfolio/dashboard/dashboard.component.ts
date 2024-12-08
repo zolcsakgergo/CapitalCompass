@@ -1,47 +1,327 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { PositionService } from '../../services/position.service';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Chart, registerables } from 'chart.js';
+import { StockService } from '../../services/stock.service';
+import { CryptoService } from '../../services/crypto.service';
+import { Subject, takeUntil, forkJoin } from 'rxjs';
+
+Chart.register(...registerables);
+
+interface PerformanceData {
+  name: string;
+  type: string;
+  changePercent: number;
+  value: number;
+}
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatCardModule,
+    MatIconModule,
+    MatSelectModule,
+    MatProgressSpinnerModule,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
-export class DashboardComponent implements OnInit {
-  totalValue: number | null = null;
-  totalPositions: number | null = null;
-  dailyChange: number | null = null;
-  ytdChange: number | null = null;
+export class DashboardComponent implements OnInit, OnDestroy {
+  @ViewChild('chartCanvas') chartCanvas!: ElementRef;
 
-  constructor(private positionService: PositionService) {}
+  totalValue = 0;
+  totalChangePercent = 0;
+  totalPositions = 0;
+  stocksCount = 0;
+  cryptoCount = 0;
+  selectedInterval = '1d';
+  selectedChartType = 'pie';
+  bestPerformer: PerformanceData | null = null;
+  private chart: Chart | null = null;
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private stockService: StockService,
+    private cryptoService: CryptoService,
+  ) {}
 
   ngOnInit() {
-    this.loadPortfolioSummary();
+    this.loadData();
   }
 
-  loadPortfolioSummary() {
-    this.positionService.getPortfolioSummary().subscribe({
-      next: summary => {
-        this.totalValue = summary.totalValue;
-        this.totalPositions = summary.totalPositions;
-        this.dailyChange = summary.dailyChange;
-        this.ytdChange = summary.ytdChange;
-      },
-      error: error => {
-        console.error('Error loading portfolio summary:', error);
-      },
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    if (this.chart) {
+      this.chart.destroy();
+    }
+  }
+
+  private loadData() {
+    // Reset values before loading new data
+    this.totalValue = 0;
+    this.totalChangePercent = 0;
+    this.bestPerformer = null;
+
+    console.log('Dashboard: Starting data load');
+
+    // Load stocks
+    this.stockService.getPositions().subscribe(stocks => {
+      console.log('Dashboard: Raw stock data:', stocks);
+
+      this.stocksCount = stocks.length;
+
+      let totalInitialValue = 0;
+      let totalCurrentValue = 0;
+
+      // Process stocks
+      stocks.forEach(stock => {
+        console.log('Dashboard: Processing stock:', stock);
+
+        const quantity = stock.shares;
+        const initialValue = stock.priceAtPurchase * quantity;
+        const currentValue =
+          (stock.currentPrice ?? stock.priceAtPurchase) * quantity;
+
+        console.log('Dashboard: Stock calculations:', {
+          name: stock.stockName,
+          shares: quantity,
+          priceAtPurchase: stock.priceAtPurchase,
+          currentPrice: stock.currentPrice,
+          initialValue,
+          currentValue,
+        });
+
+        totalInitialValue += initialValue;
+        totalCurrentValue += currentValue;
+
+        const changePercent =
+          initialValue === 0
+            ? 0
+            : ((currentValue - initialValue) / initialValue) * 100;
+
+        const performanceData: PerformanceData = {
+          name: stock.stockName,
+          type: 'stock',
+          changePercent: isFinite(changePercent) ? changePercent : 0,
+          value: currentValue,
+        };
+
+        if (
+          !this.bestPerformer ||
+          changePercent > this.bestPerformer.changePercent
+        ) {
+          this.bestPerformer = performanceData;
+        }
+      });
+
+      // Load crypto after stocks are processed
+      this.cryptoService.getPositions().subscribe(cryptos => {
+        console.log('Dashboard: Raw crypto data:', cryptos);
+
+        this.cryptoCount = cryptos.length;
+
+        // Process cryptos
+        cryptos.forEach(crypto => {
+          console.log('Dashboard: Processing crypto:', crypto);
+
+          const quantity = crypto.amount;
+          const initialValue = crypto.priceAtPurchase * quantity;
+          const currentValue =
+            (crypto.currentPrice ?? crypto.priceAtPurchase) * quantity;
+
+          console.log('Dashboard: Crypto calculations:', {
+            name: crypto.name,
+            amount: quantity,
+            priceAtPurchase: crypto.priceAtPurchase,
+            currentPrice: crypto.currentPrice,
+            initialValue,
+            currentValue,
+          });
+
+          totalInitialValue += initialValue;
+          totalCurrentValue += currentValue;
+
+          // Prevent division by zero
+          const changePercent =
+            initialValue === 0
+              ? 0
+              : ((currentValue - initialValue) / initialValue) * 100;
+
+          const performanceData: PerformanceData = {
+            name: crypto.name,
+            type: 'crypto',
+            changePercent: isFinite(changePercent) ? changePercent : 0, // Handle Infinity
+            value: currentValue,
+          };
+
+          if (
+            !this.bestPerformer ||
+            changePercent > this.bestPerformer.changePercent
+          ) {
+            this.bestPerformer = performanceData;
+          }
+        });
+
+        // Update total portfolio value and change after both stocks and crypto are processed
+        this.totalValue = totalCurrentValue;
+        if (totalInitialValue > 0) {
+          const totalChange =
+            ((totalCurrentValue - totalInitialValue) / totalInitialValue) * 100;
+          this.totalChangePercent = isFinite(totalChange) ? totalChange : 0;
+        } else {
+          this.totalChangePercent = 0;
+        }
+
+        this.updateTotalPositions();
+
+        console.log('Dashboard: Final calculations:', {
+          totalInitialValue,
+          totalCurrentValue,
+          totalValue: this.totalValue,
+          totalChangePercent: this.totalChangePercent,
+          stocksCount: this.stocksCount,
+          cryptoCount: this.cryptoCount,
+        });
+
+        // Update the chart after all calculations
+        this.updateChart();
+      });
     });
   }
 
-  getStatusColor(value: number | null): { [key: string]: boolean } {
-    if (value === null) return {};
-    return {
-      positive: value > 0,
-      negative: value < 0,
+  private updateTotalPositions() {
+    this.totalPositions = this.stocksCount + this.cryptoCount;
+  }
+
+  updatePerformance() {
+    console.log('Updating performance for interval:', this.selectedInterval);
+    this.loadData();
+  }
+
+  updateChart() {
+    if (this.chart) {
+      this.chart.destroy();
+    }
+
+    if (!this.chartCanvas) {
+      return;
+    }
+
+    const ctx = this.chartCanvas.nativeElement.getContext('2d');
+    const data = this.prepareChartData();
+
+    this.chart = new Chart(ctx, {
+      type: this.selectedChartType as any,
+      data,
+      options: this.getChartOptions(),
+    });
+  }
+
+  private prepareChartData() {
+    const defaultData = {
+      labels: [],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: [],
+        },
+      ],
     };
+
+    switch (this.selectedChartType) {
+      case 'pie':
+        return {
+          labels: ['Stocks', 'Crypto'],
+          datasets: [
+            {
+              data: [this.stocksCount, this.cryptoCount],
+              backgroundColor: ['#4299E1', '#9F7AEA'],
+            },
+          ],
+        };
+      case 'bar':
+        return {
+          labels: ['Assets'],
+          datasets: [
+            {
+              label: 'Stocks',
+              data: [this.stocksCount],
+              backgroundColor: '#4299E1',
+            },
+            {
+              label: 'Crypto',
+              data: [this.cryptoCount],
+              backgroundColor: '#9F7AEA',
+            },
+          ],
+        };
+      case 'line':
+        return {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [
+            {
+              label: 'Portfolio Value',
+              data: [0, 0, 0, 0, 0, this.totalValue],
+              borderColor: '#4299E1',
+              tension: 0.1,
+            },
+          ],
+        };
+      default:
+        return defaultData;
+    }
+  }
+
+  private getChartOptions() {
+    const baseOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+    };
+
+    switch (this.selectedChartType) {
+      case 'pie':
+        return {
+          ...baseOptions,
+          plugins: {
+            legend: {
+              position: 'bottom' as const,
+            },
+          },
+        };
+      case 'bar':
+        return {
+          ...baseOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        };
+      case 'line':
+        return {
+          ...baseOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        };
+      default:
+        return baseOptions;
+    }
   }
 }

@@ -1,14 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
-import { PositionService, Position } from '../../services/position.service';
+import { StockService } from '../../services/stock.service';
+import { CryptoService } from '../../services/crypto.service';
+import {
+  StockPosition,
+  CryptoPosition,
+} from '../../interfaces/position.interface';
+import { forkJoin } from 'rxjs';
 
 interface Transaction {
   date: string;
-  type: 'BUY' | 'SELL';
+  type: string;
   symbol: string;
-  shares: number;
+  amount: number;
   price: number;
+  total: number;
+  assetType: 'stock' | 'crypto';
 }
 
 @Component({
@@ -19,27 +27,58 @@ interface Transaction {
   styleUrls: ['./transactions.component.css'],
 })
 export class TransactionsComponent implements OnInit {
-  displayedColumns: string[] = ['date', 'type', 'symbol', 'shares', 'price'];
+  displayedColumns: string[] = [
+    'date',
+    'type',
+    'symbol',
+    'amount',
+    'price',
+    'total',
+  ];
   transactions: Transaction[] = [];
 
-  constructor(private positionService: PositionService) {}
+  constructor(
+    private stockService: StockService,
+    private cryptoService: CryptoService,
+  ) {}
 
   ngOnInit() {
     this.loadTransactions();
   }
 
   loadTransactions() {
-    this.positionService.getPositions().subscribe({
-      next: (positions: Position[]) => {
-        this.transactions = positions.map(position => ({
+    // Load both stock and crypto transactions
+    forkJoin({
+      stocks: this.stockService.getPositions(),
+      cryptos: this.cryptoService.getPositions(),
+    }).subscribe({
+      next: ({ stocks, cryptos }) => {
+        const stockTransactions: Transaction[] = stocks.map(position => ({
           date: position.dateAcquired,
-          type: position.type,
+          type: 'BUY',
           symbol: position.symbol,
-          shares: position.shares,
+          amount: position.shares,
           price: position.priceAtPurchase,
+          total: position.shares * position.priceAtPurchase,
+          assetType: 'stock',
         }));
+
+        const cryptoTransactions: Transaction[] = cryptos.map(position => ({
+          date: position.dateAcquired,
+          type: 'BUY',
+          symbol: position.symbol,
+          amount: position.amount,
+          price: position.priceAtPurchase / position.amount,
+          total: position.priceAtPurchase,
+          assetType: 'crypto',
+        }));
+
+        // Combine and sort transactions by date (newest first)
+        this.transactions = [...stockTransactions, ...cryptoTransactions].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+        );
       },
-      error: error => {
+      error: (error: Error) => {
         console.error('Error loading transactions:', error);
       },
     });
