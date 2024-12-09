@@ -1,18 +1,27 @@
-import { IsString, IsNumber, IsDateString } from 'class-validator';
+import { IsString, IsNumber, IsDateString, IsNotEmpty } from 'class-validator';
 
 export class CreateCryptoDto {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsString()
+  @IsNotEmpty()
   symbol: string;
 
   @IsNumber()
+  @IsNotEmpty()
   amount: number;
 
   @IsNumber()
-  purchasePrice: number;
+  @IsNotEmpty()
+  priceAtPurchase: number;
 
   @IsDateString()
-  purchaseDate: string;
+  @IsNotEmpty()
+  dateAcquired: string;
+
+  @IsString()
+  @IsNotEmpty()
+  type: string = 'crypto';
 }

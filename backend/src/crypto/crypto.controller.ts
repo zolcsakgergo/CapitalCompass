@@ -48,7 +48,7 @@ export class CryptoController {
       const result = await this.cryptoService.create({
         ...createCryptoDto,
         userId: req.user.id,
-        purchaseDate: new Date(createCryptoDto.purchaseDate),
+        dateAcquired: new Date(createCryptoDto.dateAcquired),
       });
       this.logger.log('Crypto position created successfully:', result);
       return result;

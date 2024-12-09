@@ -5,6 +5,19 @@
 <mat-dialog-content>
   <form #cryptoForm="ngForm" (ngSubmit)="onSubmit()">
     <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Transaction Type</mat-label>
+      <mat-select
+        [(ngModel)]="crypto.transactionType"
+        name="transactionType"
+        required
+      >
+        <mat-option *ngFor="let type of transactionTypes" [value]="type">
+          {{ type }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
       <mat-label>Name</mat-label>
       <input
         matInput
@@ -23,11 +36,11 @@
         name="symbol"
         required
         placeholder="e.g., BTC"
-        pattern="[A-Z]+"
+        pattern="[A-Za-z]+"
       />
-      <mat-hint>Enter the symbol in uppercase (e.g., BTC for Bitcoin)</mat-hint>
+      <mat-hint>Enter the symbol (e.g., BTC for Bitcoin)</mat-hint>
       <mat-error *ngIf="cryptoForm.form.get('symbol')?.hasError('pattern')">
-        Symbol must be in uppercase letters only
+        Symbol must contain letters only
       </mat-error>
     </mat-form-field>
 
@@ -42,30 +55,30 @@
         min="0"
         step="any"
       />
-      <mat-hint>Enter the amount of cryptocurrency you purchased</mat-hint>
+      <mat-hint>Enter the amount of cryptocurrency</mat-hint>
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Total Purchase Price (USD)</mat-label>
+      <mat-label>Price per Unit (USD)</mat-label>
       <input
         matInput
         type="number"
-        [(ngModel)]="crypto.purchasePrice"
-        name="purchasePrice"
+        [(ngModel)]="crypto.priceAtPurchase"
+        name="priceAtPurchase"
         required
         min="0"
         step="any"
       />
-      <mat-hint>Enter the total amount you spent in USD</mat-hint>
+      <mat-hint>Enter the price per unit in USD</mat-hint>
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Purchase Date</mat-label>
+      <mat-label>Transaction Date</mat-label>
       <input
         matInput
         [matDatepicker]="picker"
-        [(ngModel)]="crypto.purchaseDate"
-        name="purchaseDate"
+        [(ngModel)]="crypto.dateAcquired"
+        name="dateAcquired"
         required
       />
       <mat-datepicker-toggle
@@ -86,6 +99,6 @@
     (click)="onSubmit()"
     [disabled]="!cryptoForm.form.valid"
   >
-    Add
+    {{ crypto.transactionType === 'BUY' ? 'Buy' : 'Sell' }} Crypto
   </button>
 </mat-dialog-actions>

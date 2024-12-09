@@ -6,9 +6,11 @@ import { CryptoModule } from './crypto/crypto.module';
 import { AuthModule } from './auth/auth.module';
 import { StocksModule } from './stocks/stocks.module';
 import { TwelveDataModule } from './twelve-data/twelve-data.module';
+import { TransactionsModule } from './transactions/transactions.module';
 import { Crypto } from './crypto/entities/crypto.entity';
 import { User } from './auth/entities/user.entity';
 import { Stock } from './stocks/entities/stock.entity';
+import { Transaction } from './transactions/entities/transaction.entity';
 import { join } from 'path';
 
 @Module({
@@ -19,13 +21,14 @@ import { join } from 'path';
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: join(__dirname, '..', 'db.sqlite'),
-      entities: [User, Crypto, Stock],
+      entities: [User, Crypto, Stock, Transaction],
       synchronize: true,
     }),
     CryptoModule,
     AuthModule,
     StocksModule,
     TwelveDataModule,
+    TransactionsModule,
   ],
   providers: [
     {

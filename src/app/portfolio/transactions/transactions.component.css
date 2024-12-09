@@ -1,26 +1,28 @@
 .transactions-container {
   padding: 20px;
-}
-
-h2 {
-  margin-bottom: 24px;
-  color: #2d3748;
-  font-size: 24px;
+  margin: 20px;
 }
 
 table {
   width: 100%;
 }
 
-.no-data {
-  text-align: center;
-  padding: 40px;
-  background: #f7fafc;
-  border-radius: 8px;
-  color: #a0aec0;
+.mat-form-field {
+  width: 100%;
+  margin-bottom: 20px;
 }
 
-.no-data p {
-  margin: 0;
-  font-style: italic;
+.buy {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.sell {
+  color: #f44336;
+  font-weight: bold;
+}
+
+th.mat-header-cell {
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.87);
 }

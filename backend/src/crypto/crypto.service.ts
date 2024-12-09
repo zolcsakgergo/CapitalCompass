@@ -47,7 +47,7 @@ export class CryptoService {
           const currentValue = currentPrice * crypto.amount;
           // Total change based on current value vs purchase price (total cost)
           const totalChange =
-            ((currentValue - crypto.purchasePrice) / crypto.purchasePrice) *
+            ((currentValue - crypto.priceAtPurchase) / crypto.priceAtPurchase) *
             100;
 
           return {
@@ -112,7 +112,7 @@ export class CryptoService {
         const currentValue = currentPrice * data.amount;
         // Total change based on current value vs purchase price (total cost)
         const totalChange =
-          ((currentValue - data.purchasePrice) / data.purchasePrice) * 100;
+          ((currentValue - data.priceAtPurchase) / data.priceAtPurchase) * 100;
 
         const crypto = this.cryptoRepository.create({
           ...data,
@@ -131,8 +131,8 @@ export class CryptoService {
         const crypto = this.cryptoRepository.create({
           ...data,
           user,
-          currentPrice: data.purchasePrice,
-          currentValue: data.purchasePrice * data.amount,
+          currentPrice: data.priceAtPurchase,
+          currentValue: data.priceAtPurchase * data.amount,
           totalChange: 0,
         });
 
@@ -144,8 +144,8 @@ export class CryptoService {
       const crypto = this.cryptoRepository.create({
         ...data,
         user,
-        currentPrice: data.purchasePrice,
-        currentValue: data.purchasePrice * data.amount,
+        currentPrice: data.priceAtPurchase,
+        currentValue: data.priceAtPurchase * data.amount,
         totalChange: 0,
       });
       return this.cryptoRepository.save(crypto);

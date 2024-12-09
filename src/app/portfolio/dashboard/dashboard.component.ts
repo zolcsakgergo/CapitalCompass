@@ -99,7 +99,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log('Dashboard: Stock calculations:', {
           name: stock.stockName,
           shares: quantity,
-          priceAtPurchase: stock.priceAtPurchase,
+          purchasePrice: stock.priceAtPurchase,
           currentPrice: stock.currentPrice,
           initialValue,
           currentValue,
@@ -146,7 +146,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           console.log('Dashboard: Crypto calculations:', {
             name: crypto.name,
             amount: quantity,
-            priceAtPurchase: crypto.priceAtPurchase,
+            purchasePrice: crypto.priceAtPurchase,
             currentPrice: crypto.currentPrice,
             initialValue,
             currentValue,

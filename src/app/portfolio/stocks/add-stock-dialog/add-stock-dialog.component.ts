@@ -1,43 +1,36 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import {
-  MatNativeDateModule,
-  provideNativeDateAdapter,
-} from '@angular/material/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { MatDialogRef } from '@angular/material/dialog';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { StockService } from '../../../services/stock.service';
+import { MaterialModule } from '../../../shared/material.module';
+
+interface StockData {
+  stockName: string;
+  symbol: string;
+  shares: number;
+  priceAtPurchase: number;
+  dateAcquired: string;
+  userId: number;
+  type: 'stock';
+}
 
 @Component({
   selector: 'app-add-stock-dialog',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-  ],
+  imports: [CommonModule, FormsModule, MaterialModule],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-stock-dialog.component.html',
   styleUrls: ['./add-stock-dialog.component.css'],
 })
 export class AddStockDialogComponent {
-  stock = {
+  stock: any = {
     stockName: '',
     symbol: '',
-    shares: null as number | null,
-    priceAtPurchase: null as number | null,
-    dateAcquired: new Date(),
+    shares: null,
+    purchasePrice: null,
+    purchaseDate: new Date(),
   };
 
   constructor(
@@ -46,14 +39,24 @@ export class AddStockDialogComponent {
   ) {}
 
   onSubmit() {
-    if (this.stock.shares && this.stock.priceAtPurchase) {
-      const stockData = {
-        stockName: this.stock.stockName,
-        symbol: this.stock.symbol.toUpperCase(),
+    if (!this.isFormValid()) {
+      console.error('Form validation failed');
+      return;
+    }
+
+    try {
+      // Format the date to ISO string
+      const date = new Date(this.stock.purchaseDate);
+      const isoDate = date.toISOString().split('T')[0];
+
+      const stockData: StockData = {
+        stockName: this.stock.stockName.trim(),
+        symbol: this.stock.symbol.toUpperCase().trim(),
         shares: Number(this.stock.shares),
-        priceAtPurchase: Number(this.stock.priceAtPurchase),
-        dateAcquired: this.formatDate(this.stock.dateAcquired),
+        priceAtPurchase: Number(Number(this.stock.purchasePrice).toFixed(2)),
+        dateAcquired: isoDate,
         userId: 1, // TODO: Get from auth service
+        type: 'stock' as const,
       };
 
       this.stockService.addPosition(stockData).subscribe({
@@ -62,8 +65,11 @@ export class AddStockDialogComponent {
         },
         error: error => {
           console.error('Error adding stock:', error);
+          console.error('Request payload:', JSON.stringify(stockData, null, 2));
         },
       });
+    } catch (error) {
+      console.error('Error preparing stock data:', error);
     }
   }
 
@@ -71,8 +77,32 @@ export class AddStockDialogComponent {
     this.dialogRef.close();
   }
 
-  private formatDate(date: Date): string {
-    // Format date as YYYY-MM-DD for backend
-    return date.toISOString().split('T')[0];
+  private isFormValid(): boolean {
+    if (!this.stock.stockName || !this.stock.symbol) {
+      console.error('Name or symbol is missing');
+      return false;
+    }
+
+    const shares = Number(this.stock.shares);
+    if (isNaN(shares) || shares <= 0) {
+      console.error('Invalid shares:', this.stock.shares);
+      return false;
+    }
+
+    const price = Number(this.stock.purchasePrice);
+    if (isNaN(price) || price <= 0) {
+      console.error('Invalid price:', this.stock.purchasePrice);
+      return false;
+    }
+
+    if (
+      !(this.stock.purchaseDate instanceof Date) ||
+      isNaN(this.stock.purchaseDate.getTime())
+    ) {
+      console.error('Invalid date:', this.stock.purchaseDate);
+      return false;
+    }
+
+    return true;
   }
 }

@@ -14,7 +14,7 @@ import {
 import { StocksService, CreateStockDto } from './stocks.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-@Controller('stocks')
+@Controller('api/stocks')
 @UseGuards(JwtAuthGuard)
 export class StocksController {
   private readonly logger = new Logger(StocksController.name);

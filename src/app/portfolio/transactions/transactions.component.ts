@@ -1,86 +1,80 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { StockService } from '../../services/stock.service';
-import { CryptoService } from '../../services/crypto.service';
+import { MaterialModule } from '../../shared/material.module';
 import {
-  StockPosition,
-  CryptoPosition,
-} from '../../interfaces/position.interface';
-import { forkJoin } from 'rxjs';
-
-interface Transaction {
-  date: string;
-  type: string;
-  symbol: string;
-  amount: number;
-  price: number;
-  total: number;
-  assetType: 'stock' | 'crypto';
-}
+  TransactionService,
+  Transaction,
+} from '../../services/transaction.service';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-transactions',
   standalone: true,
-  imports: [CommonModule, MatTableModule],
+  imports: [CommonModule, MaterialModule],
   templateUrl: './transactions.component.html',
   styleUrls: ['./transactions.component.css'],
 })
 export class TransactionsComponent implements OnInit {
   displayedColumns: string[] = [
-    'date',
-    'type',
+    'transactionDate',
+    'assetType',
+    'transactionType',
+    'name',
     'symbol',
     'amount',
-    'price',
-    'total',
+    'pricePerUnit',
+    'totalValue',
   ];
-  transactions: Transaction[] = [];
+  dataSource: MatTableDataSource<Transaction>;
 
-  constructor(
-    private stockService: StockService,
-    private cryptoService: CryptoService,
-  ) {}
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
+  constructor(private transactionService: TransactionService) {
+    this.dataSource = new MatTableDataSource<Transaction>();
+  }
 
   ngOnInit() {
     this.loadTransactions();
   }
 
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+  }
+
   loadTransactions() {
-    // Load both stock and crypto transactions
-    forkJoin({
-      stocks: this.stockService.getPositions(),
-      cryptos: this.cryptoService.getPositions(),
-    }).subscribe({
-      next: ({ stocks, cryptos }) => {
-        const stockTransactions: Transaction[] = stocks.map(position => ({
-          date: position.dateAcquired,
-          type: 'BUY',
-          symbol: position.symbol,
-          amount: position.shares,
-          price: position.priceAtPurchase,
-          total: position.shares * position.priceAtPurchase,
-          assetType: 'stock',
-        }));
-
-        const cryptoTransactions: Transaction[] = cryptos.map(position => ({
-          date: position.dateAcquired,
-          type: 'BUY',
-          symbol: position.symbol,
-          amount: position.amount,
-          price: position.priceAtPurchase / position.amount,
-          total: position.priceAtPurchase,
-          assetType: 'crypto',
-        }));
-
-        // Combine and sort transactions by date (newest first)
-        this.transactions = [...stockTransactions, ...cryptoTransactions].sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-        );
+    console.log('Loading transactions...');
+    this.transactionService.getTransactions().subscribe({
+      next: transactions => {
+        console.log('Received transactions:', transactions);
+        this.dataSource.data = transactions;
+        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
       },
-      error: (error: Error) => {
+      error: error => {
         console.error('Error loading transactions:', error);
+        if (error.status === 401) {
+          console.error(
+            'Authentication error - token may be invalid or expired',
+          );
+        } else if (error.status === 404) {
+          console.error('API endpoint not found');
+        } else {
+          console.error('Unexpected error:', error.message);
+        }
       },
     });
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 }

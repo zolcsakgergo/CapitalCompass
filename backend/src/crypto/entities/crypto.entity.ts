@@ -18,14 +18,17 @@ export class Crypto {
   @Column()
   symbol: string;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 8 })
   amount: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  purchasePrice: number;
+  @Column('decimal', { precision: 10, scale: 2, nullable: false })
+  priceAtPurchase: number;
 
-  @Column({ type: 'datetime' })
-  purchaseDate: Date;
+  @Column({ type: 'datetime', nullable: false })
+  dateAcquired: Date;
+
+  @Column({ default: 'crypto' })
+  type: string;
 
   @Column('decimal', { precision: 10, scale: 2, nullable: true })
   currentPrice: number;
