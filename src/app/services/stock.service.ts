@@ -1,31 +1,35 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, switchMap } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { StockPosition } from '../interfaces/position.interface';
 import { TransactionService } from './transaction.service';
+import { API_ROUTES } from '../constants/api.routes';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StockService {
-  private readonly apiUrl = `${environment.apiUrl}/api/stocks`;
-
   constructor(
     private http: HttpClient,
     private transactionService: TransactionService,
   ) {}
 
   getPositions(): Observable<StockPosition[]> {
-    return this.http.get<StockPosition[]>(this.apiUrl);
+    console.log('[API] Requesting stocks from:', API_ROUTES.STOCKS);
+    return this.http
+      .get<StockPosition[]>(API_ROUTES.STOCKS)
+      .pipe(
+        tap(response =>
+          console.log('[API] Received stocks response:', response),
+        ),
+      );
   }
 
   addPosition(
     position: Omit<StockPosition, 'id' | 'userId'>,
   ): Observable<StockPosition> {
-    return this.http.post<StockPosition>(this.apiUrl, position).pipe(
+    return this.http.post<StockPosition>(API_ROUTES.STOCKS, position).pipe(
       switchMap(newPosition => {
-        // Create a transaction record
         const transaction = {
           assetType: 'STOCK' as const,
           transactionType:
@@ -47,6 +51,6 @@ export class StockService {
   }
 
   deletePosition(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${API_ROUTES.STOCKS}/${id}`);
   }
 }

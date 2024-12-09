@@ -1,4 +1,10 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+  Injectable,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +23,45 @@ import { AddStockDialogComponent } from './add-stock-dialog/add-stock-dialog.com
 import { StockService } from '../../services/stock.service';
 import { StockPosition } from '../../interfaces/position.interface';
 import { MatTableDataSource } from '@angular/material/table';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
+import {
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
+  HttpResponse,
+} from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { clearCache } from '../../interceptors/cache.interceptor';
+import { takeUntil } from 'rxjs/operators';
+
+@Injectable()
+export class CacheInterceptor implements HttpInterceptor {
+  private cache = new Map<string, HttpResponse<any>>();
+
+  intercept(
+    req: HttpRequest<any>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<any>> {
+    if (req.method !== 'GET') {
+      return next.handle(req);
+    }
+
+    const cachedResponse = this.cache.get(req.url);
+    if (cachedResponse) {
+      return of(cachedResponse.clone());
+    }
+
+    return next.handle(req).pipe(
+      tap(event => {
+        if (event instanceof HttpResponse) {
+          this.cache.set(req.url, event.clone());
+        }
+      }),
+    );
+  }
+}
 
 @Component({
   selector: 'app-stocks',
@@ -41,6 +85,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./stocks.component.css'],
 })
 export class StocksComponent implements OnInit, OnDestroy {
+  stocks: StockPosition[] = [];
   dataSource: MatTableDataSource<StockPosition>;
   displayedColumns: string[] = [
     'stockName',
@@ -55,6 +100,7 @@ export class StocksComponent implements OnInit, OnDestroy {
   isLoading = false;
   error: string | null = null;
   private positionsSubscription: Subscription | null = null;
+  private destroy$ = new Subject<void>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -73,9 +119,8 @@ export class StocksComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.positionsSubscription) {
-      this.positionsSubscription.unsubscribe();
-    }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngAfterViewInit() {
@@ -118,22 +163,33 @@ export class StocksComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadStocks() {
-    console.log('Starting to load stocks...');
+  loadStocks(): void {
     this.isLoading = true;
     this.error = null;
-    this.positionsSubscription = this.stockService.getPositions().subscribe({
-      next: stocks => {
-        console.log('Loaded stocks:', stocks);
-        this.dataSource.data = stocks;
-        this.isLoading = false;
-      },
-      error: error => {
-        console.error('Error loading stocks:', error);
-        this.error = 'Failed to load stocks. Please try again.';
-        this.isLoading = false;
-      },
-    });
+    console.log('[Stocks] Making API call to load stocks');
+
+    this.stockService
+      .getPositions()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: stocks => {
+          this.stocks = stocks.map(stock => ({
+            ...stock,
+            totalValue:
+              stock.shares * (stock.currentPrice ?? stock.priceAtPurchase),
+            totalChange: this.calculateTotalChange(stock),
+            purchaseDate: new Date(stock.dateAcquired),
+          }));
+          this.dataSource.data = this.stocks;
+          this.isLoading = false;
+          console.log('[Stocks] Successfully loaded stocks:', stocks.length);
+        },
+        error: error => {
+          console.error('Error loading stocks:', error);
+          this.error = 'Failed to load stocks. Please try again.';
+          this.isLoading = false;
+        },
+      });
   }
 
   openAddStockDialog() {
@@ -169,5 +225,19 @@ export class StocksComponent implements OnInit, OnDestroy {
         },
       });
     }
+  }
+
+  refreshStocks(): void {
+    clearCache();
+    this.loadStocks();
+  }
+
+  private calculateTotalChange(stock: StockPosition): number {
+    const initialValue = stock.shares * stock.priceAtPurchase;
+    const currentValue =
+      stock.shares * (stock.currentPrice ?? stock.priceAtPurchase);
+    return initialValue === 0
+      ? 0
+      : ((currentValue - initialValue) / initialValue) * 100;
   }
 }
