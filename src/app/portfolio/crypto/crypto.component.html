@@ -37,11 +37,9 @@
         <ng-container matColumnDef="purchasePrice">
           <th mat-header-cell *matHeaderCellDef>Total Cost</th>
           <td mat-cell *matCellDef="let crypto">
-            {{ crypto.purchasePrice | currency }}
+            {{ crypto.amount * crypto.priceAtPurchase | currency }}
             <div class="price-hint">
-              ({{ crypto.purchasePrice / crypto.amount | currency }}/{{
-                crypto.symbol
-              }})
+              ({{ crypto.priceAtPurchase | currency }}/{{ crypto.symbol }})
             </div>
           </td>
         </ng-container>
@@ -49,9 +47,14 @@
         <ng-container matColumnDef="currentPrice">
           <th mat-header-cell *matHeaderCellDef>Current Value</th>
           <td mat-cell *matCellDef="let crypto">
-            {{ crypto.currentPrice * crypto.amount | currency }}
+            {{
+              crypto.amount * (crypto.currentPrice ?? crypto.priceAtPurchase)
+                | currency
+            }}
             <div class="price-hint">
-              ({{ crypto.currentPrice | currency }}/{{ crypto.symbol }})
+              ({{ crypto.currentPrice ?? crypto.priceAtPurchase | currency }}/{{
+                crypto.symbol
+              }})
             </div>
           </td>
         </ng-container>
