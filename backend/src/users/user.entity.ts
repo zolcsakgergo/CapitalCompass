@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Crypto } from '../crypto/entities/crypto.entity';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -20,6 +21,12 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
+  @OneToMany(() => Crypto, crypto => crypto.user)
+  cryptos: Crypto[];
+
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
+
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 }

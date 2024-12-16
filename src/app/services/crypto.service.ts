@@ -25,7 +25,6 @@ export class CryptoService {
   ): Observable<CryptoPosition> {
     return this.http.post<CryptoPosition>(this.apiUrl, position).pipe(
       switchMap(newPosition => {
-        // Create a transaction record
         const transaction = {
           assetType: 'CRYPTO' as const,
           transactionType:

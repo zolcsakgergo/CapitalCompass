@@ -1,0 +1,74 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+  >
+    <mat-toolbar>Menu</mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/portfolio">Dashboard</a>
+      <a mat-list-item routerLink="/portfolio/stocks">Stocks</a>
+      <a mat-list-item routerLink="/portfolio/crypto">Crypto</a>
+      <a mat-list-item routerLink="/portfolio/transactions">Transactions</a>
+      <a mat-list-item routerLink="/profile" routerLinkActive="active"
+        >Profile</a
+      >
+    </mat-nav-list>
+    <div class="logout-container">
+      <button mat-raised-button color="warn" (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        Logout
+      </button>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async"
+      >
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <span>Investment Tracker</span>
+    </mat-toolbar>
+
+    <div class="profile-container">
+      <mat-card class="profile-card">
+        <mat-card-header>
+          <mat-card-title>My Profile</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="profile-info">
+            <div class="info-row">
+              <span class="label">First Name:</span>
+              <span class="value">{{ userProfile?.firstName }}</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="info-row">
+              <span class="label">Last Name:</span>
+              <span class="value">{{ userProfile?.lastName }}</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="info-row">
+              <span class="label">Email:</span>
+              <span class="value">{{ userProfile?.email }}</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="info-row">
+              <span class="label">Member Since:</span>
+              <span class="value">{{
+                userProfile?.createdAt | date: 'mediumDate'
+              }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

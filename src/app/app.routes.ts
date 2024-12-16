@@ -26,5 +26,11 @@ export const routes: Routes = [
   },
   { path: 'access-denied', component: AccessDeniedComponent },
   { path: '', component: LandingComponent },
+  {
+    path: 'profile',
+    loadComponent: () =>
+      import('./profile/profile.component').then(m => m.ProfileComponent),
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: '' },
 ];

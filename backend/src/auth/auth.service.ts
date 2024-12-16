@@ -3,7 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from './entities/user.entity';
+import { User } from '../users/user.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private jwtService: JwtService,
+    private usersService: UsersService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -52,12 +54,18 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
       },
     };
   }
 
-  async register(email: string, password: string, name: string) {
+  async register(
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+  ) {
     this.logger.debug(`Registration attempt for email: ${email}`);
 
     const existingUser = await this.usersRepository.findOne({
@@ -73,7 +81,8 @@ export class AuthService {
     const user = this.usersRepository.create({
       email,
       password: hashedPassword,
-      name,
+      firstName,
+      lastName,
     });
 
     const savedUser = await this.usersRepository.save(user);
@@ -82,5 +91,9 @@ export class AuthService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: pwd, ...result } = savedUser;
     return result;
+  }
+
+  async getProfile(userId: number) {
+    return this.usersService.getUserProfile(userId);
   }
 }

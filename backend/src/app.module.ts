@@ -8,7 +8,7 @@ import { StocksModule } from './stocks/stocks.module';
 import { TwelveDataModule } from './twelve-data/twelve-data.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { Crypto } from './crypto/entities/crypto.entity';
-import { User } from './auth/entities/user.entity';
+import { User } from './users/user.entity';
 import { Stock } from './stocks/entities/stock.entity';
 import { Transaction } from './transactions/entities/transaction.entity';
 import { join } from 'path';

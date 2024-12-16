@@ -33,12 +33,12 @@ export class AuthService {
     firstName: string;
     lastName: string;
   }): Observable<any> {
-    const registerData = {
+    return this.http.post(`${this.API_URL}/register`, {
       email: userData.email,
       password: userData.password,
-      name: `${userData.firstName} ${userData.lastName}`,
-    };
-    return this.http.post(`${this.API_URL}/register`, registerData);
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+    });
   }
 
   logout(): void {
@@ -51,5 +51,9 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return !!this.getToken();
+  }
+
+  getUserProfile(): Observable<any> {
+    return this.http.get<any>(`${this.API_URL}/profile`);
   }
 }

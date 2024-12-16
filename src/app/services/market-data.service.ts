@@ -19,7 +19,7 @@ export class MarketDataService {
   private requestCount = 0;
   private lastRequestTime = Date.now();
   private readonly requestLimit = 8;
-  private readonly timeWindow = 60000; // 1 minute in milliseconds
+  private readonly timeWindow = 60000;
 
   constructor(private http: HttpClient) {}
 
@@ -83,12 +83,9 @@ export class MarketDataService {
       );
   }
 
-  // This method can be used to setup real-time price updates
-  // It uses throttleTime to ensure we don't exceed rate limits
   setupPriceUpdates(symbols: string[]): Observable<Map<string, number>> {
     const subject = new Subject<Map<string, number>>();
 
-    // Update prices every 15 seconds, but ensure we don't exceed rate limits
     timer(0, 15000)
       .pipe(throttleTime(this.timeWindow / this.requestLimit))
       .subscribe(() => {
