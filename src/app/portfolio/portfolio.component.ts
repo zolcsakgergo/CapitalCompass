@@ -1,17 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatButtonModule } from '@angular/material/button';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { MaterialSharedModule } from '../shared/material-shared.module';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import {
-  RouterLink,
-  RouterLinkActive,
-  RouterOutlet,
-  Router,
-} from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 
 @Component({
@@ -19,27 +13,22 @@ import { AuthService } from '../auth/auth.service';
   standalone: true,
   imports: [
     CommonModule,
-    MatSidenavModule,
-    MatButtonModule,
-    MatIconModule,
-    MatToolbarModule,
-    MatListModule,
-    MatTooltipModule,
+    RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    RouterOutlet,
+    MaterialSharedModule,
+    MatIconModule,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatListModule,
   ],
   templateUrl: './portfolio.component.html',
   styleUrls: ['./portfolio.component.css'],
 })
 export class PortfolioComponent {
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   logout() {
     this.authService.logout();
-    this.router.navigate(['/']);
   }
 }

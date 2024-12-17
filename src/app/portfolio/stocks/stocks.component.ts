@@ -6,23 +6,13 @@ import {
   Injectable,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialog } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatTableModule, MatTable } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
-import { MatSortModule, MatSort } from '@angular/material/sort';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { MaterialSharedModule } from '../../shared/material-shared.module';
+import { MaterialDataModule } from '../../shared/material-data.module';
+import { MaterialFormsModule } from '../../shared/material-forms.module';
 import { AddStockDialogComponent } from './add-stock-dialog/add-stock-dialog.component';
 import { StockService } from '../../services/stock.service';
 import { StockPosition } from '../../interfaces/position.interface';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { Subscription, Subject } from 'rxjs';
 import {
   HttpEvent,
@@ -35,6 +25,15 @@ import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { clearCache } from '../../interceptors/cache.interceptor';
 import { takeUntil } from 'rxjs/operators';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSort } from '@angular/material/sort';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @Injectable()
 export class CacheInterceptor implements HttpInterceptor {
@@ -68,18 +67,15 @@ export class CacheInterceptor implements HttpInterceptor {
   standalone: true,
   imports: [
     CommonModule,
-    MatButtonModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatTableModule,
+    MaterialSharedModule,
+    MaterialDataModule,
+    MaterialFormsModule,
     MatIconModule,
-    MatTooltipModule,
+    MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-    MatProgressSpinnerModule,
     MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
+    MatDialogModule,
   ],
   templateUrl: './stocks.component.html',
   styleUrls: ['./stocks.component.css'],

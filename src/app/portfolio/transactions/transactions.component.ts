@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../../shared/material.module';
+import { MaterialSharedModule } from '../../shared/material-shared.module';
+import { MaterialDataModule } from '../../shared/material-data.module';
+import { MaterialFormsModule } from '../../shared/material-forms.module';
 import {
   TransactionService,
   Transaction,
@@ -12,7 +14,12 @@ import { MatSort } from '@angular/material/sort';
 @Component({
   selector: 'app-transactions',
   standalone: true,
-  imports: [CommonModule, MaterialModule],
+  imports: [
+    CommonModule,
+    MaterialSharedModule,
+    MaterialDataModule,
+    MaterialFormsModule,
+  ],
   templateUrl: './transactions.component.html',
   styleUrls: ['./transactions.component.css'],
 })

@@ -8,13 +8,12 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { SignupComponent } from '../signup/signup.component';
+import { MaterialSharedModule } from '../../shared/material-shared.module';
+import { MaterialFormsModule } from '../../shared/material-forms.module';
+import { MaterialFeedbackModule } from '../../shared/material-feedback.module';
+import { MaterialDataModule } from '../../shared/material-data.module';
 
 @Component({
   selector: 'app-login',
@@ -22,11 +21,10 @@ import { SignupComponent } from '../signup/signup.component';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatProgressBarModule,
+    MaterialSharedModule,
+    MaterialFormsModule,
+    MaterialFeedbackModule,
+    MaterialDataModule,
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],

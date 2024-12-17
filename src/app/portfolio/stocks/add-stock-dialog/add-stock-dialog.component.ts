@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MaterialSharedModule } from '../../../shared/material-shared.module';
+import { MaterialFormsModule } from '../../../shared/material-forms.module';
+import { MaterialFeedbackModule } from '../../../shared/material-feedback.module';
 import { MatDialogRef } from '@angular/material/dialog';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { StockService } from '../../../services/stock.service';
-import { MaterialModule } from '../../../shared/material.module';
 
 interface StockData {
   stockName: string;
@@ -19,7 +21,13 @@ interface StockData {
 @Component({
   selector: 'app-add-stock-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, MaterialModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MaterialSharedModule,
+    MaterialFormsModule,
+    MaterialFeedbackModule,
+  ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-stock-dialog.component.html',
   styleUrls: ['./add-stock-dialog.component.css'],

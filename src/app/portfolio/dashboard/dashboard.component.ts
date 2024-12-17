@@ -7,16 +7,42 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
+import { MaterialSharedModule } from '../../shared/material-shared.module';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Chart, registerables } from 'chart.js';
 import { StockService } from '../../services/stock.service';
 import { CryptoService } from '../../services/crypto.service';
-import { Subject, takeUntil, forkJoin } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
+import { Chart, ChartType } from 'chart.js';
+import {
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  PieController,
+  BarController,
+  LineController,
+} from 'chart.js';
 
-Chart.register(...registerables);
+Chart.register(
+  ArcElement,
+  BarElement,
+  CategoryScale,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  PieController,
+  BarController,
+  LineController,
+);
 
 interface PerformanceData {
   name: string;
@@ -31,16 +57,15 @@ interface PerformanceData {
   imports: [
     CommonModule,
     FormsModule,
-    MatCardModule,
-    MatIconModule,
+    MaterialSharedModule,
+    MatFormFieldModule,
     MatSelectModule,
-    MatProgressSpinnerModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  @ViewChild('chartCanvas') chartCanvas!: ElementRef;
+  @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
 
   totalValue = 0;
   totalChangePercent = 0;
@@ -48,7 +73,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   stocksCount = 0;
   cryptoCount = 0;
   selectedInterval = '1d';
-  selectedChartType = 'pie';
+  selectedChartType: ChartType = 'pie';
   bestPerformer: PerformanceData | null = null;
   private chart: Chart | null = null;
   private destroy$ = new Subject<void>();
@@ -68,6 +93,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.chart) {
       this.chart.destroy();
     }
+  }
+
+  private loadChart() {
+    if (!this.chartCanvas) {
+      return;
+    }
+
+    if (this.chart) {
+      this.chart.destroy();
+    }
+
+    const ctx = this.chartCanvas.nativeElement.getContext('2d');
+    if (!ctx) {
+      return;
+    }
+
+    const data = this.prepareChartData();
+    const options = this.getChartOptions();
+
+    this.chart = new Chart(ctx, {
+      type: this.selectedChartType,
+      data,
+      options,
+    });
   }
 
   private loadData() {
@@ -212,7 +261,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
-  updateChart() {
+  async updateChart() {
     if (this.chart) {
       this.chart.destroy();
     }
@@ -222,12 +271,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
-    const data = this.prepareChartData();
+    if (!ctx) {
+      return;
+    }
 
-    this.chart = new Chart(ctx, {
-      type: this.selectedChartType as any,
+    const data = this.prepareChartData();
+    const options = this.getChartOptions();
+
+    this.chart = new Chart(this.chartCanvas.nativeElement, {
+      type: this.selectedChartType,
       data,
-      options: this.getChartOptions(),
+      options,
     });
   }
 

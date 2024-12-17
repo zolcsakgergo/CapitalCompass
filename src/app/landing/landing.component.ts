@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatCardModule } from '@angular/material/card';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MaterialSharedModule } from '../shared/material-shared.module';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoginComponent } from '../auth/login/login.component';
 import { SignupComponent } from '../auth/signup/signup.component';
 import { AuthService } from '../auth/auth.service';
@@ -13,14 +11,7 @@ import { AuthService } from '../auth/auth.service';
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatToolbarModule,
-    MatCardModule,
-    MatSnackBarModule,
-  ],
+  imports: [CommonModule, MaterialSharedModule],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css'],
 })
