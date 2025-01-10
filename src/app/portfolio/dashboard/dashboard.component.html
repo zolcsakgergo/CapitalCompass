@@ -1,105 +1,113 @@
+<!-- Main Dashboard Container -->
 <div class="dashboard-container">
-  <h1>Portfolio Dashboard</h1>
-
-  <!-- Overview Cards -->
-  <div class="overview-grid">
-    <!-- Portfolio Value Card -->
-    <mat-card class="overview-card">
+  <!-- Portfolio Overview Section -->
+  <div class="overview-section">
+    <mat-card>
       <mat-card-header>
-        <mat-icon>account_balance</mat-icon>
-        <mat-card-title>Portfolio Value</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="value-content">
-          <h2>{{ totalValue | currency }}</h2>
-          <div
-            class="change-info"
-            [ngClass]="totalChangePercent >= 0 ? 'positive' : 'negative'"
+        <mat-card-title>Portfolio Overview</mat-card-title>
+        <div class="header-actions">
+          <button
+            mat-button
+            [matMenuTriggerFor]="settingsMenu"
+            class="settings-button"
           >
-            <span>{{ totalChangePercent | number: '1.2-2' }}%</span>
-            <mat-icon>{{
-              totalChangePercent >= 0 ? 'arrow_upward' : 'arrow_downward'
-            }}</mat-icon>
+            <mat-icon>account_circle</mat-icon>
+            <span>Settings & Profile</span>
+            <mat-icon>arrow_drop_down</mat-icon>
+          </button>
+          <mat-menu #settingsMenu="matMenu" class="settings-menu">
+            <button mat-menu-item routerLink="/portfolio/settings">
+              <mat-icon>settings</mat-icon>
+              <span>Portfolio Settings</span>
+            </button>
+            <button mat-menu-item routerLink="/profile">
+              <mat-icon>person</mat-icon>
+              <span>Profile Settings</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>exit_to_app</mat-icon>
+              <span>Logout</span>
+            </button>
+          </mat-menu>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="overview-grid">
+          <div class="overview-item">
+            <span class="label">Total Value</span>
+            <span class="value">${{ totalValue.toFixed(2) }}</span>
           </div>
-          <mat-form-field>
-            <mat-label>Interval</mat-label>
-            <mat-select
-              [(ngModel)]="selectedInterval"
-              (selectionChange)="updatePerformance()"
+          <div class="overview-item">
+            <span class="label">Total Change</span>
+            <span
+              class="value"
+              [ngClass]="{
+                positive: totalChangePercent > 0,
+                negative: totalChangePercent < 0,
+              }"
             >
-              <mat-option value="1d">1 Day</mat-option>
-              <mat-option value="1w">1 Week</mat-option>
-              <mat-option value="1m">1 Month</mat-option>
-              <mat-option value="1y">1 Year</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Total Positions Card -->
-    <mat-card class="overview-card">
-      <mat-card-header>
-        <mat-icon>show_chart</mat-icon>
-        <mat-card-title>Total Positions</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="positions-content">
-          <h2>{{ totalPositions }}</h2>
-          <div class="positions-breakdown">
-            <div class="breakdown-item">
-              <mat-icon>trending_up</mat-icon>
-              <span>{{ stocksCount }} Stocks</span>
-            </div>
-            <div class="breakdown-item">
-              <mat-icon>currency_bitcoin</mat-icon>
-              <span>{{ cryptoCount }} Crypto</span>
-            </div>
+              {{ totalChangePercent.toFixed(2) }}%
+            </span>
+          </div>
+          <div class="overview-item">
+            <span class="label">Total Positions</span>
+            <span class="value">{{ totalPositions }}</span>
+          </div>
+          <div class="overview-item">
+            <span class="label">Stocks</span>
+            <span class="value">{{ stocksCount }}</span>
+          </div>
+          <div class="overview-item">
+            <span class="label">Crypto</span>
+            <span class="value">{{ cryptoCount }}</span>
+          </div>
+          <div class="overview-item" *ngIf="bestPerformer">
+            <span class="label">Best Performer</span>
+            <span class="value positive">{{ bestPerformer.name }}</span>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Best Performing Asset Card -->
-    <mat-card class="overview-card">
-      <mat-card-header>
-        <mat-icon>stars</mat-icon>
-        <mat-card-title>Best Performer</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="performer-content" *ngIf="bestPerformer">
-          <h3>{{ bestPerformer.name }}</h3>
-          <div class="change-info positive">
-            <span>{{ bestPerformer.changePercent | number: '1.2-2' }}%</span>
-            <mat-icon>arrow_upward</mat-icon>
-          </div>
-          <p class="asset-type">{{ bestPerformer.type }}</p>
-        </div>
-        <p *ngIf="!bestPerformer" class="no-data">No assets yet</p>
       </mat-card-content>
     </mat-card>
   </div>
 
   <!-- Chart Section -->
-  <mat-card class="chart-card">
-    <mat-card-header>
-      <mat-card-title>Portfolio Analysis</mat-card-title>
-      <mat-form-field>
-        <mat-label>Chart Type</mat-label>
-        <mat-select
-          [(ngModel)]="selectedChartType"
-          (selectionChange)="updateChart()"
-        >
-          <mat-option value="pie">Asset Distribution (Pie)</mat-option>
-          <mat-option value="bar">Asset Comparison (Bar)</mat-option>
-          <mat-option value="line">Portfolio Growth (Line)</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="chart-container">
+  <div class="chart-section">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Portfolio Visualization</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
         <canvas #chartCanvas></canvas>
-      </div>
-    </mat-card-content>
-  </mat-card>
+        <div class="chart-controls">
+          <mat-form-field appearance="outline">
+            <mat-label>Chart Type</mat-label>
+            <mat-select
+              [(ngModel)]="selectedChartType"
+              (selectionChange)="updateChart()"
+            >
+              <mat-option value="pie">Pie Chart</mat-option>
+              <mat-option value="bar">Bar Chart</mat-option>
+              <mat-option value="line">Line Chart</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Quick Trade Section -->
+  <div class="quick-trade-section">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Quick Trade</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-quick-trade
+          (tradeSubmitted)="handleQuickTrade($event)"
+          (tradeCancelled)="handleTradeCancelled()"
+        ></app-quick-trade>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>

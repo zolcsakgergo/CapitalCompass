@@ -30,6 +30,13 @@ export const PORTFOLIO_ROUTES: Routes = [
             m => m.TransactionsComponent,
           ),
       },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./settings/portfolio-settings.component').then(
+            m => m.PortfolioSettingsComponent,
+          ),
+      },
     ],
   },
 ];

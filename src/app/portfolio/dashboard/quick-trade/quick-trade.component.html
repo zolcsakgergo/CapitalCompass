@@ -1,0 +1,68 @@
+<form
+  #tradeForm="ngForm"
+  (ngSubmit)="onSubmit(tradeForm)"
+  class="quick-trade-form"
+>
+  <mat-form-field appearance="outline">
+    <mat-label>Asset Type</mat-label>
+    <mat-select [(ngModel)]="trade.assetType" name="assetType" required>
+      <mat-option value="stock">Stock</mat-option>
+      <mat-option value="crypto">Crypto</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Symbol</mat-label>
+    <input
+      matInput
+      [(ngModel)]="trade.symbol"
+      name="symbol"
+      required
+      pattern="^[A-Za-z0-9.]+$"
+      maxlength="10"
+      #symbol="ngModel"
+    />
+    <mat-error *ngIf="symbol.errors?.['pattern']">
+      Symbol can only contain letters, numbers, and dots
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Quantity</mat-label>
+    <input
+      matInput
+      type="number"
+      [(ngModel)]="trade.quantity"
+      name="quantity"
+      required
+      min="0.00000001"
+      step="0.00000001"
+      #quantity="ngModel"
+    />
+    <mat-error *ngIf="quantity.errors?.['min']">
+      Quantity must be greater than 0
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Trade Type</mat-label>
+    <mat-select [(ngModel)]="trade.tradeType" name="tradeType" required>
+      <mat-option value="buy">Buy</mat-option>
+      <mat-option value="sell">Sell</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="button-group">
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="!tradeForm.valid"
+    >
+      Execute Trade
+    </button>
+    <button mat-raised-button type="button" (click)="cancelTrade(tradeForm)">
+      Cancel
+    </button>
+  </div>
+</form>

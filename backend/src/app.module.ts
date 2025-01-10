@@ -11,6 +11,10 @@ import { Crypto } from './crypto/entities/crypto.entity';
 import { User } from './users/user.entity';
 import { Stock } from './stocks/entities/stock.entity';
 import { Transaction } from './transactions/entities/transaction.entity';
+import {
+  PortfolioSettings,
+  PriceAlert,
+} from './portfolio/entities/portfolio-settings.entity';
 import { join } from 'path';
 
 @Module({
@@ -21,7 +25,14 @@ import { join } from 'path';
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: join(__dirname, '..', 'db.sqlite'),
-      entities: [User, Crypto, Stock, Transaction],
+      entities: [
+        User,
+        Crypto,
+        Stock,
+        Transaction,
+        PortfolioSettings,
+        PriceAlert,
+      ],
       synchronize: true,
     }),
     CryptoModule,

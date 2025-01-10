@@ -44,15 +44,31 @@ export class CryptoService {
           );
 
           // Calculate current value (current market price * amount)
-          const currentValue = currentPrice * crypto.amount;
-          // Total change based on current value vs purchase price (total cost)
-          const totalChange =
-            ((currentValue - crypto.priceAtPurchase) / crypto.priceAtPurchase) *
-            100;
+          const currentValue = Number(
+            (currentPrice * crypto.amount).toFixed(2),
+          );
+
+          // Calculate total change with bounds checking and precision handling
+          let totalChange = 0;
+          if (crypto.priceAtPurchase > 0) {
+            const initialValue = crypto.priceAtPurchase * crypto.amount;
+            if (initialValue > 0) {
+              totalChange = Number(
+                (((currentValue - initialValue) / initialValue) * 100).toFixed(
+                  2,
+                ),
+              );
+              // Ensure the value is within SQLite's decimal bounds
+              totalChange = Math.max(
+                Math.min(totalChange, 999999.99),
+                -999999.99,
+              );
+            }
+          }
 
           return {
             ...crypto,
-            currentPrice,
+            currentPrice: Number(currentPrice.toFixed(2)),
             currentValue,
             totalChange,
           };
@@ -109,15 +125,28 @@ export class CryptoService {
         );
 
         // Calculate current value (current market price * amount)
-        const currentValue = currentPrice * data.amount;
-        // Total change based on current value vs purchase price (total cost)
-        const totalChange =
-          ((currentValue - data.priceAtPurchase) / data.priceAtPurchase) * 100;
+        const currentValue = Number((currentPrice * data.amount).toFixed(2));
+
+        // Calculate total change with bounds checking and precision handling
+        let totalChange = 0;
+        if (data.priceAtPurchase > 0) {
+          const initialValue = data.priceAtPurchase * data.amount;
+          if (initialValue > 0) {
+            totalChange = Number(
+              (((currentValue - initialValue) / initialValue) * 100).toFixed(2),
+            );
+            // Ensure the value is within SQLite's decimal bounds
+            totalChange = Math.max(
+              Math.min(totalChange, 999999.99),
+              -999999.99,
+            );
+          }
+        }
 
         const crypto = this.cryptoRepository.create({
           ...data,
           user,
-          currentPrice,
+          currentPrice: Number(currentPrice.toFixed(2)),
           currentValue,
           totalChange,
         });

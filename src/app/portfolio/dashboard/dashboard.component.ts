@@ -10,10 +10,16 @@ import { FormsModule } from '@angular/forms';
 import { MaterialSharedModule } from '../../shared/material-shared.module';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
+import { RouterModule, Router } from '@angular/router';
 import { StockService } from '../../services/stock.service';
 import { CryptoService } from '../../services/crypto.service';
+import { AuthService } from '../../auth/auth.service';
 import { Subject, takeUntil } from 'rxjs';
 import { Chart, ChartType } from 'chart.js';
+import { QuickTradeComponent } from './quick-trade/quick-trade.component';
 import {
   ArcElement,
   BarElement,
@@ -60,6 +66,11 @@ interface PerformanceData {
     MaterialSharedModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatTooltipModule,
+    MatMenuModule,
+    MatDividerModule,
+    RouterModule,
+    QuickTradeComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -81,6 +92,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(
     private stockService: StockService,
     private cryptoService: CryptoService,
+    private authService: AuthService,
+    private router: Router,
   ) {}
 
   ngOnInit() {
@@ -377,5 +390,48 @@ export class DashboardComponent implements OnInit, OnDestroy {
       default:
         return baseOptions;
     }
+  }
+
+  handleQuickTrade(trade: any) {
+    console.log('Processing quick trade:', trade);
+    if (trade.assetType === 'stock') {
+      this.stockService
+        .addPosition({
+          stockName: trade.symbol,
+          symbol: trade.symbol,
+          shares: trade.quantity,
+          priceAtPurchase: 0,
+          dateAcquired: new Date().toISOString(),
+          type: 'stock',
+        })
+        .subscribe({
+          next: () => this.loadData(),
+          error: error => console.error('Error processing stock trade:', error),
+        });
+    } else {
+      this.cryptoService
+        .addPosition({
+          name: trade.symbol,
+          symbol: trade.symbol,
+          amount: trade.quantity,
+          priceAtPurchase: 0,
+          dateAcquired: new Date().toISOString(),
+          type: 'crypto',
+        })
+        .subscribe({
+          next: () => this.loadData(),
+          error: error =>
+            console.error('Error processing crypto trade:', error),
+        });
+    }
+  }
+
+  handleTradeCancelled() {
+    console.log('Trade cancelled');
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 }
