@@ -57,3 +57,30 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Environment Setup
+
+Before running the application, you need to set up your environment files:
+
+### Frontend Environment
+
+1. Copy `src/environments/environment.template.ts` to `src/environments/environment.ts`
+2. Update the values in `environment.ts` with your actual configuration:
+   ```typescript
+   export const environment = {
+     production: false,
+     apiUrl: 'http://localhost:3000/api',
+     twelveDataApiKey: 'YOUR_TWELVE_DATA_API_KEY', // Get this from Twelve Data
+   };
+   ```
+
+### Backend Environment
+
+1. Copy `backend/.env.template` to `backend/.env`
+2. Update the values in `.env` with your actual configuration:
+   ```
+   TWELVE_DATA_API_KEY=your_twelve_data_api_key
+   JWT_SECRET=your_secure_jwt_secret_key_here
+   ```
+
+**Note:** Never commit the actual environment files (`environment.ts` and `.env`) to version control as they contain sensitive information. Only the template files should be committed.

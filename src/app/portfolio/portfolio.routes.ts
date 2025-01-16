@@ -1,41 +1,33 @@
 import { Routes } from '@angular/router';
+import {
+  PORTFOLIO_ROUTES,
+  PORTFOLIO_COMPONENTS,
+} from '../constants/portfolio.routes';
 
-export const PORTFOLIO_ROUTES: Routes = [
+export const PORTFOLIO_MODULE_ROUTES: Routes = [
   {
-    path: '',
-    loadComponent: () =>
-      import('./portfolio.component').then(m => m.PortfolioComponent),
+    path: PORTFOLIO_ROUTES.ROOT,
+    loadComponent: PORTFOLIO_COMPONENTS.ROOT,
     children: [
       {
-        path: '',
-        loadComponent: () =>
-          import('./dashboard/dashboard.component').then(
-            m => m.DashboardComponent,
-          ),
+        path: PORTFOLIO_ROUTES.DASHBOARD,
+        loadComponent: PORTFOLIO_COMPONENTS.DASHBOARD,
       },
       {
-        path: 'stocks',
-        loadComponent: () =>
-          import('./stocks/stocks.component').then(m => m.StocksComponent),
+        path: PORTFOLIO_ROUTES.STOCKS,
+        loadComponent: PORTFOLIO_COMPONENTS.STOCKS,
       },
       {
-        path: 'crypto',
-        loadComponent: () =>
-          import('./crypto/crypto.component').then(m => m.CryptoComponent),
+        path: PORTFOLIO_ROUTES.CRYPTO,
+        loadComponent: PORTFOLIO_COMPONENTS.CRYPTO,
       },
       {
-        path: 'transactions',
-        loadComponent: () =>
-          import('./transactions/transactions.component').then(
-            m => m.TransactionsComponent,
-          ),
+        path: PORTFOLIO_ROUTES.TRANSACTIONS,
+        loadComponent: PORTFOLIO_COMPONENTS.TRANSACTIONS,
       },
       {
-        path: 'settings',
-        loadComponent: () =>
-          import('./settings/portfolio-settings.component').then(
-            m => m.PortfolioSettingsComponent,
-          ),
+        path: PORTFOLIO_ROUTES.SETTINGS,
+        loadComponent: PORTFOLIO_COMPONENTS.SETTINGS,
       },
     ],
   },
