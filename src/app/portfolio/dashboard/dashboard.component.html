@@ -78,7 +78,15 @@
         <mat-card-title>Portfolio Visualization</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <canvas #chartCanvas></canvas>
+        <div class="chart-container">
+          <canvas
+            appPortfolioChart
+            [chartType]="selectedChartType"
+            [chartData]="chartData"
+            [chartOptions]="chartOptions"
+          >
+          </canvas>
+        </div>
         <div class="chart-controls">
           <mat-form-field appearance="outline">
             <mat-label>Chart Type</mat-label>
