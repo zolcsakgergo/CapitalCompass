@@ -7,7 +7,7 @@
 /bazel-out
 
 # Node
-/node_modules
+node_modules/
 npm-debug.log
 yarn-debug.log
 yarn-error.log
@@ -26,19 +26,12 @@ yarn-error.log
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# Environment files
-.env
-backend/.env
-src/environments/environment.ts
-src/environments/environment.prod.ts
+# Angular specific
+.angular/
+.angular/cache/
+*.spec.ts
 
-# But allow environment templates
-!src/environments/environment.template.ts
-!backend/.env.template
-
-# Misc
-/.sass-cache
-/connect.lock
+# Testing
 /coverage
 /libpeerconnection.log
 testem.log
@@ -47,3 +40,15 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Misc
+/.sass-cache
+/connect.lock
+
+# Environment files
+.env
+backend/.env
+
+# Keep environment templates
+!src/environments/environment.template.ts
+!backend/.env.template

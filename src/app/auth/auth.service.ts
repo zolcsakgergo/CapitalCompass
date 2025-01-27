@@ -5,8 +5,11 @@ import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 interface AuthResponse {
-  token: string;
-  userId: string;
+  access_token: string;
+  user: {
+    id?: string;
+    email: string;
+  };
 }
 
 interface SignupData {
@@ -37,12 +40,15 @@ export class AuthService {
     const token = localStorage.getItem('token');
     const userId = localStorage.getItem('userId');
     if (token && userId) {
+      console.log('Found stored token, validating...');
       this.validateToken(token).subscribe({
         next: () => {
+          console.log('Token validated successfully');
           this.tokenSubject.next(token);
           this.userIdSubject.next(userId);
         },
-        error: () => {
+        error: error => {
+          console.error('Token validation failed:', error);
           this.clearAuth();
         },
       });
@@ -50,39 +56,53 @@ export class AuthService {
   }
 
   signup(userData: SignupData): Observable<AuthResponse> {
+    console.log('Attempting signup...');
     return this.http
       .post<AuthResponse>(`${this.API_URL}/register`, userData)
       .pipe(
         tap(response => {
+          console.log('Signup successful');
           this.setAuth(response);
+          this.router.navigate(['/portfolio']);
         }),
-        catchError(this.handleError),
+        catchError(this.handleError.bind(this)),
       );
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
+    console.log('Attempting login...');
     return this.http
       .post<AuthResponse>(`${this.API_URL}/login`, { email, password })
       .pipe(
         tap(response => {
+          console.log('Login successful');
           this.setAuth(response);
+          this.router.navigate(['/portfolio']);
         }),
-        catchError(this.handleError),
+        catchError(this.handleError.bind(this)),
       );
   }
 
   logout() {
+    console.log('Logging out...');
     this.clearAuth();
   }
 
   private setAuth(response: AuthResponse) {
-    this.tokenSubject.next(response.token);
-    this.userIdSubject.next(response.userId);
-    localStorage.setItem('token', response.token);
-    localStorage.setItem('userId', response.userId);
+    console.log('Setting auth state...');
+    if (!response.access_token || !response.user) {
+      console.error('Invalid auth response:', response);
+      throw new Error('Invalid authentication response');
+    }
+    this.tokenSubject.next(response.access_token);
+    this.userIdSubject.next(response.user.id || response.user.email);
+    localStorage.setItem('token', response.access_token);
+    localStorage.setItem('userId', response.user.id || response.user.email);
+    console.log('Auth state set successfully');
   }
 
   private clearAuth() {
+    console.log('Clearing auth state...');
     this.tokenSubject.next(null);
     this.userIdSubject.next(null);
     localStorage.removeItem('token');
@@ -91,8 +111,11 @@ export class AuthService {
   }
 
   private validateToken(token: string): Observable<any> {
+    console.log('Validating token...');
     return this.http.get(`${this.API_URL}/validate-token`).pipe(
+      tap(() => console.log('Token validation request successful')),
       catchError((error: HttpErrorResponse) => {
+        console.error('Token validation failed:', error);
         if (error.status === 401) {
           this.clearAuth();
         }
@@ -102,7 +125,9 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return this.tokenSubject.value;
+    const token = this.tokenSubject.value;
+    console.log('Getting token:', token ? 'Token exists' : 'No token');
+    return token;
   }
 
   getUserId(): string | null {
@@ -110,12 +135,17 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.tokenSubject.value;
+    const isAuth = !!this.tokenSubject.value;
+    console.log('Checking authentication:', isAuth);
+    return isAuth;
   }
 
   getUserProfile(): Observable<any> {
+    console.log('Fetching user profile...');
     return this.http.get(`${this.API_URL}/profile`).pipe(
+      tap(profile => console.log('Profile fetched successfully:', profile)),
       catchError((error: HttpErrorResponse) => {
+        console.error('Error fetching profile:', error);
         if (error.status === 401) {
           this.clearAuth();
         }
@@ -125,12 +155,16 @@ export class AuthService {
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
+    console.error('API Error:', error);
     let errorMessage = 'An unknown error occurred!';
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
+      console.error('Client Error:', error.error.message);
       errorMessage = error.error.message;
     } else {
       // Server-side error
+      console.error('Server Error:', error.status, error.error);
       if (error.status === 401) {
         this.clearAuth();
         errorMessage = 'Authentication failed. Please log in again.';
