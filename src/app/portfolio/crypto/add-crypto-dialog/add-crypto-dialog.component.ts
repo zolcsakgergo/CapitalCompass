@@ -30,7 +30,7 @@ interface CryptoData {
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-crypto-dialog.component.html',
-  styleUrls: ['./add-crypto-dialog.component.css'],
+  styleUrls: ['./add-crypto-dialog.component.scss'],
 })
 export class AddCryptoDialogComponent {
   transactionTypes: ('BUY' | 'SELL')[] = ['BUY', 'SELL'];

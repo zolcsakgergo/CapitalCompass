@@ -1,0 +1,29 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.quick-trade-form {
+  @include flex-column;
+  gap: $spacing-md;
+  max-width: 400px;
+  margin: $spacing-md;
+}
+
+.button-group {
+  @include flex-between;
+  gap: $spacing-md;
+  margin-top: $spacing-md;
+
+  button {
+    flex: 1;
+    @include button-base;
+
+    &[type='button'] {
+      background-color: $surface;
+    }
+  }
+}
+
+// Form field styles
+:host {
+  @include material-theme-overrides;
+}

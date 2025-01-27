@@ -21,7 +21,7 @@ import { AddCryptoDialogComponent } from './add-crypto-dialog/add-crypto-dialog.
     MatDialogModule,
   ],
   templateUrl: './crypto.component.html',
-  styleUrls: ['./crypto.component.css'],
+  styleUrls: ['./crypto.component.scss'],
 })
 export class CryptoComponent implements OnInit {
   cryptos: CryptoPosition[] = [];

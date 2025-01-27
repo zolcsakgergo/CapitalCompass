@@ -1,0 +1,127 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.dashboard-container {
+  @include grid-responsive(300px);
+  padding: $spacing-lg;
+  max-width: $breakpoint-lg;
+  margin: 0 auto;
+}
+
+.settings-button {
+  background-color: rgba($text-primary, 0.03);
+  border-radius: $border-radius-pill;
+  padding: 0 $spacing-md;
+  height: 40px;
+  @include flex-center;
+  gap: $spacing-xs;
+
+  &:hover {
+    background-color: rgba($text-primary, 0.08);
+  }
+
+  mat-icon {
+    margin: 0;
+  }
+
+  span {
+    margin: 0 $spacing-xs;
+  }
+}
+
+.settings-menu {
+  min-width: 200px;
+
+  .mat-mdc-menu-item {
+    @include flex-center;
+    gap: $spacing-xs;
+
+    mat-icon {
+      margin-right: $spacing-xs;
+    }
+  }
+}
+
+.overview-section {
+  grid-column: 1 / -1;
+}
+
+.overview-grid {
+  @include grid-responsive;
+  padding: $spacing-md 0;
+}
+
+.overview-item {
+  @include flex-column;
+  align-items: center;
+  text-align: center;
+  padding: $spacing-md;
+  background-color: rgba($text-primary, 0.03);
+  border-radius: $border-radius-md;
+
+  .label {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin-bottom: $spacing-xs;
+  }
+
+  .value {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.chart-section {
+  grid-column: 1 / 2;
+
+  .chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+  }
+
+  .chart-controls {
+    @include flex-center;
+    margin-top: $spacing-md;
+  }
+}
+
+.quick-trade-section {
+  grid-column: 2 / 3;
+}
+
+mat-card {
+  height: 100%;
+  box-shadow: $shadow-sm !important;
+}
+
+mat-card-header {
+  margin-bottom: $spacing-md;
+  @include flex-between;
+}
+
+.header-actions {
+  margin-left: auto;
+}
+
+@include respond-to(md) {
+  .dashboard-container {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-section,
+  .quick-trade-section {
+    grid-column: 1 / -1;
+  }
+}
+
+@include respond-to(sm) {
+  .overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-container {
+    padding: $spacing-md;
+    gap: $spacing-md;
+  }
+}

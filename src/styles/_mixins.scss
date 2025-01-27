@@ -1,0 +1,130 @@
+@use 'variables' as *;
+
+// Responsive Breakpoints
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == sm {
+    @media (max-width: $breakpoint-sm) {
+      @content;
+    }
+  }
+  @if $breakpoint == md {
+    @media (max-width: $breakpoint-md) {
+      @content;
+    }
+  }
+  @if $breakpoint == lg {
+    @media (max-width: $breakpoint-lg) {
+      @content;
+    }
+  }
+  @if $breakpoint == xl {
+    @media (max-width: $breakpoint-xl) {
+      @content;
+    }
+  }
+}
+
+// Card Styles
+@mixin card {
+  background: $background;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-md;
+  padding: $spacing-lg;
+}
+
+// Status Indicators
+@mixin status-indicator($type: 'default') {
+  font-weight: $font-weight-medium;
+
+  @if $type == 'positive' {
+    color: $success;
+  } @else if $type == 'negative' {
+    color: $error;
+  } @else if $type == 'warning' {
+    color: $warning;
+  } @else if $type == 'info' {
+    color: $info;
+  }
+}
+
+// Table Styles
+@mixin table-styles {
+  .mat-mdc-header-cell {
+    font-weight: $font-weight-medium;
+    color: $text-secondary;
+    background: $surface;
+  }
+
+  .mat-mdc-cell {
+    color: $text-primary;
+  }
+
+  .mat-mdc-row {
+    &:hover {
+      background: rgba($primary, 0.04);
+    }
+  }
+}
+
+// Form Field Styles
+@mixin form-field {
+  .mat-mdc-form-field {
+    width: 100%;
+    margin-bottom: $spacing-md;
+  }
+}
+
+// Flex Layout Patterns
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-end {
+  display: flex;
+  justify-content: flex-end;
+}
+
+// Grid Layout
+@mixin grid-responsive($min-width: 200px) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  gap: $spacing-md;
+}
+
+// Button Styles
+@mixin button-base {
+  padding: $spacing-sm $spacing-md;
+  border-radius: $border-radius-sm;
+  font-weight: $font-weight-medium;
+  transition: all 0.2s ease;
+}
+
+// Material Theme Overrides
+@mixin material-theme-overrides {
+  :host ::ng-deep {
+    .mat-mdc-card {
+      @include card;
+    }
+
+    .mat-mdc-table {
+      @include table-styles;
+    }
+
+    .mat-mdc-form-field {
+      @include form-field;
+    }
+  }
+}

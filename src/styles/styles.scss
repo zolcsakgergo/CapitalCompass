@@ -1,0 +1,57 @@
+@use '@angular/material' as mat;
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// Global styles
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: $font-family;
+}
+
+// Core layout classes
+.container {
+  padding: $spacing-md;
+  max-width: $breakpoint-lg;
+  margin: 0 auto;
+}
+
+// Common utility classes
+.flex-center {
+  @include flex-center;
+}
+
+.flex-between {
+  @include flex-between;
+}
+
+.flex-column {
+  @include flex-column;
+}
+
+// Status indicators
+.positive {
+  color: $success;
+}
+.negative {
+  color: $error;
+}
+.warning {
+  color: $warning;
+}
+.info {
+  color: $info;
+}
+
+// Material overrides
+.mat-mdc-card {
+  @include card;
+}
+
+// Responsive adjustments
+@include respond-to(sm) {
+  .container {
+    padding: $spacing-sm;
+  }
+}

@@ -1,0 +1,68 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.crypto-container {
+  padding: $spacing-lg;
+}
+
+h1 {
+  margin-bottom: $spacing-lg;
+  color: $text-primary;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-medium;
+}
+
+mat-card {
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+}
+
+mat-card-header {
+  padding: $spacing-md;
+  border-bottom: 1px solid $border;
+}
+
+mat-card-content {
+  padding: $spacing-lg;
+}
+
+.no-data {
+  text-align: center;
+  padding: $spacing-xl;
+  color: $text-secondary;
+}
+
+table {
+  width: 100%;
+  margin-bottom: $spacing-lg;
+
+  .mat-mdc-header-cell {
+    font-weight: $font-weight-medium;
+    color: $text-secondary;
+  }
+
+  .mat-mdc-cell,
+  .mat-mdc-header-cell {
+    padding: $spacing-md;
+  }
+}
+
+.positive {
+  @include status-indicator('positive');
+}
+
+.negative {
+  @include status-indicator('negative');
+}
+
+button {
+  margin-top: $spacing-md;
+
+  mat-icon {
+    margin-right: $spacing-xs;
+  }
+}
+
+.add-button {
+  margin-top: $spacing-lg;
+}

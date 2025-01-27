@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -14,6 +14,7 @@ import { MaterialSharedModule } from '../../shared/material-shared.module';
 import { MaterialFormsModule } from '../../shared/material-forms.module';
 import { MaterialFeedbackModule } from '../../shared/material-feedback.module';
 import { MaterialDataModule } from '../../shared/material-data.module';
+import { CustomValidators } from '../../shared/validators/custom.validators';
 
 @Component({
   selector: 'app-login',
@@ -27,59 +28,85 @@ import { MaterialDataModule } from '../../shared/material-data.module';
     MaterialDataModule,
   ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  isLoading = false;
-  error = '';
+  hidePassword = true;
+  errorMessage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private dialogRef: MatDialogRef<LoginComponent>,
-    private dialog: MatDialog,
+    @Optional() private dialogRef: MatDialogRef<LoginComponent>,
+    @Optional() private dialog: MatDialog,
   ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      email: ['', [Validators.required, CustomValidators.emailValidator]],
+      password: ['', [Validators.required, CustomValidators.passwordValidator]],
     });
+  }
+
+  getErrorMessage(field: string): string {
+    const control = this.loginForm.get(field);
+    if (!control) return '';
+
+    if (control.hasError('required')) {
+      return `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+    }
+
+    if (field === 'email') {
+      if (control.hasError('invalidEmail')) {
+        return 'Please enter a valid email address';
+      }
+      if (control.hasError('invalidDomain')) {
+        return 'Please use a common email domain (e.g., gmail.com, yahoo.com)';
+      }
+    }
+
+    if (field === 'password') {
+      if (control.hasError('minlength')) {
+        return 'Password must be at least 12 characters long';
+      }
+      if (control.hasError('insufficientUppercase')) {
+        return 'Password must contain at least 2 uppercase letters';
+      }
+      if (control.hasError('missingNumber')) {
+        return 'Password must contain at least 1 number';
+      }
+      if (control.hasError('missingSpecialChar')) {
+        return 'Password must contain at least 1 special character';
+      }
+    }
+
+    return '';
   }
 
   onSubmit() {
     if (this.loginForm.valid) {
-      this.isLoading = true;
-      this.error = '';
       const { email, password } = this.loginForm.value;
-
       this.authService.login(email, password).subscribe({
-        next: response => {
-          console.log('Login successful', response);
-          this.dialogRef.close(true);
+        next: () => {
+          if (this.dialogRef) {
+            this.dialogRef.close();
+          }
           this.router.navigate(['/portfolio']);
         },
         error: error => {
-          console.error('Login failed', error);
-          this.error =
-            error.error?.message ||
-            'Login failed. Please check your credentials.';
-          this.isLoading = false;
-        },
-        complete: () => {
-          this.isLoading = false;
+          this.errorMessage =
+            error.error?.message || 'Login failed. Please try again.';
         },
       });
     }
   }
 
   openSignup() {
-    this.dialogRef.close();
-    this.dialog.open(SignupComponent, {
-      width: '400px',
-      panelClass: 'auth-dialog',
-      backdropClass: 'auth-dialog-backdrop',
-      disableClose: false,
-    });
+    if (this.dialog) {
+      this.dialogRef?.close();
+      this.dialog.open(SignupComponent);
+    } else {
+      this.router.navigate(['/signup']);
+    }
   }
 }

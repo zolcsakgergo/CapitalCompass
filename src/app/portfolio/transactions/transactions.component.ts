@@ -21,7 +21,7 @@ import { MatSort } from '@angular/material/sort';
     MaterialFormsModule,
   ],
   templateUrl: './transactions.component.html',
-  styleUrls: ['./transactions.component.css'],
+  styleUrls: ['./transactions.component.scss'],
 })
 export class TransactionsComponent implements OnInit {
   displayedColumns: string[] = [

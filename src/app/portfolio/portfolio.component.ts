@@ -23,7 +23,7 @@ import { AuthService } from '../auth/auth.service';
     MatListModule,
   ],
   templateUrl: './portfolio.component.html',
-  styleUrls: ['./portfolio.component.css'],
+  styleUrls: ['./portfolio.component.scss'],
 })
 export class PortfolioComponent {
   constructor(private authService: AuthService) {}

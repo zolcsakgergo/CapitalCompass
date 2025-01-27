@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MaterialSharedModule } from '../../shared/material-shared.module';
 import { MaterialFormsModule } from '../../shared/material-forms.module';
 import { FormsModule } from '@angular/forms';
@@ -33,9 +33,10 @@ interface PerformanceData {
     PortfolioChartDirective,
     MatMenuModule,
     MatDividerModule,
+    RouterModule,
   ],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css'],
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   // Portfolio metrics

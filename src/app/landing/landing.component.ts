@@ -13,7 +13,7 @@ import { AuthService } from '../auth/auth.service';
   standalone: true,
   imports: [CommonModule, MaterialSharedModule],
   templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.css'],
+  styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent implements OnInit {
   isLoggedIn = false;

@@ -14,6 +14,7 @@ import { MaterialDataModule } from '../../shared/material-data.module';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../login/login.component';
 import { AuthService } from '../auth.service';
+import { CustomValidators } from '../../shared/validators/custom.validators';
 
 @Component({
   selector: 'app-signup',
@@ -27,13 +28,12 @@ import { AuthService } from '../auth.service';
     MaterialDataModule,
   ],
   templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.css'],
+  styleUrls: ['./signup.component.scss'],
 })
 export class SignupComponent {
   signupForm: FormGroup;
-  isLoading = false;
-  error = '';
-  success = '';
+  hidePassword = true;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -45,40 +45,52 @@ export class SignupComponent {
     this.signupForm = this.fb.group({
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      email: ['', [Validators.required, CustomValidators.emailValidator]],
+      password: ['', [Validators.required, CustomValidators.passwordValidator]],
     });
+  }
+
+  getErrorMessage(controlName: string): string {
+    const control = this.signupForm.get(controlName);
+    if (!control?.errors) return '';
+
+    if (controlName === 'email') {
+      if (control.errors['invalidFormat']) {
+        return 'Please enter a valid email address';
+      }
+      if (control.errors['invalidDomain']) {
+        return `Email domain must be one of: ${control.errors['invalidDomain'].validDomains.join(', ')}`;
+      }
+    }
+
+    if (controlName === 'password') {
+      if (control.errors['minLength']) {
+        return `Password must be at least ${control.errors['minLength'].required} characters long`;
+      }
+      if (control.errors['upperCase']) {
+        return `Password must contain at least ${control.errors['upperCase'].required} uppercase letters`;
+      }
+      if (control.errors['number']) {
+        return 'Password must contain at least one number';
+      }
+      if (control.errors['specialChar']) {
+        return 'Password must contain at least one special character';
+      }
+    }
+
+    return 'This field is required';
   }
 
   onSubmit() {
     if (this.signupForm.valid) {
-      this.isLoading = true;
-      this.error = '';
-      this.success = '';
-
-      const userData = {
-        firstName: this.signupForm.value.firstName,
-        lastName: this.signupForm.value.lastName,
-        email: this.signupForm.value.email,
-        password: this.signupForm.value.password,
-      };
-
-      this.authService.register(userData).subscribe({
-        next: response => {
-          console.log('Registration successful:', response);
-          this.success = 'Registration successful! Redirecting to login...';
-          this.error = '';
+      this.authService.signup(this.signupForm.value).subscribe({
+        next: () => {
           this.dialogRef.close(true);
+          this.router.navigate(['/portfolio']);
         },
-        error: err => {
-          console.error('Registration failed:', err);
-          this.error =
-            err.error?.message || 'An error occurred during registration';
-          this.success = '';
-          this.isLoading = false;
-        },
-        complete: () => {
-          this.isLoading = false;
+        error: error => {
+          this.errorMessage =
+            error.message || 'An error occurred during signup';
         },
       });
     }

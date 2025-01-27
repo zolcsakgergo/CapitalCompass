@@ -1,6 +1,6 @@
 import {
   MatDividerModule
-} from "./chunk-HQQETW46.js";
+} from "./chunk-TRIF7T2Q.js";
 import {
   SelectionModel
 } from "./chunk-GSQIO3JL.js";
@@ -22,13 +22,13 @@ import {
   _CdkPrivateStyleLoader,
   _StructuralStylesLoader,
   hasModifierKey
-} from "./chunk-VLMIL6PB.js";
+} from "./chunk-J46PIKW4.js";
 import {
   Platform,
   _getFocusedElementPierceShadowDom,
   coerceBooleanProperty,
   coerceNumberProperty
-} from "./chunk-YTCJ5BMF.js";
+} from "./chunk-SYGHJHTX.js";
 import {
   NgTemplateOutlet
 } from "./chunk-FR5GTIZY.js";
@@ -47,6 +47,7 @@ import {
   NgModule,
   NgZone,
   Output,
+  Renderer2,
   ViewChild,
   ViewEncapsulation,
   forwardRef,
@@ -980,10 +981,11 @@ var MatListOption = class _MatListOption extends MatListItemBase {
   }
   /**
    * Theme color of the list option. This sets the color of the checkbox/radio.
-   * This API is supported in M2 themes only, it has no effect in M3 themes.
+   * This API is supported in M2 themes only, it has no effect in M3 themes. For color customization
+   * in M3, see https://material.angular.io/components/list/styling.
    *
    * For information on applying color variants in M3, see
-   * https://material.angular.io/guide/theming#using-component-color-variants.
+   * https://material.angular.io/guide/material-2-theming#optional-add-backwards-compatibility-styles-for-color-variants
    */
   get color() {
     return this._color || this._selectionList.color;
@@ -1500,8 +1502,10 @@ var MatSelectionListChange = class {
 var MatSelectionList = class _MatSelectionList extends MatListBase {
   _element = inject(ElementRef);
   _ngZone = inject(NgZone);
+  _renderer = inject(Renderer2);
   _initialized = false;
   _keyManager;
+  _listenerCleanups;
   /** Emits when the list has been destroyed. */
   _destroyed = new Subject();
   /** Whether the list has been destroyed. */
@@ -1515,10 +1519,10 @@ var MatSelectionList = class _MatSelectionList extends MatListBase {
   /**
    * Theme color of the selection list. This sets the checkbox color for all
    * list options. This API is supported in M2 themes only, it has no effect in
-   * M3 themes.
+   * M3 themes. For color customization in M3, see https://material.angular.io/components/list/styling.
    *
    * For information on applying color variants in M3, see
-   * https://material.angular.io/guide/theming#using-component-color-variants.
+   * https://material.angular.io/guide/material-2-theming#optional-add-backwards-compatibility-styles-for-color-variants
    */
   color = "accent";
   /**
@@ -1566,8 +1570,7 @@ var MatSelectionList = class _MatSelectionList extends MatListBase {
     this._initialized = true;
     this._setupRovingTabindex();
     this._ngZone.runOutsideAngular(() => {
-      this._element.nativeElement.addEventListener("focusin", this._handleFocusin);
-      this._element.nativeElement.addEventListener("focusout", this._handleFocusout);
+      this._listenerCleanups = [this._renderer.listen(this._element.nativeElement, "focusin", this._handleFocusin), this._renderer.listen(this._element.nativeElement, "focusout", this._handleFocusout)];
     });
     if (this._value) {
       this._setOptionsFromValues(this._value);
@@ -1584,8 +1587,7 @@ var MatSelectionList = class _MatSelectionList extends MatListBase {
   }
   ngOnDestroy() {
     this._keyManager?.destroy();
-    this._element.nativeElement.removeEventListener("focusin", this._handleFocusin);
-    this._element.nativeElement.removeEventListener("focusout", this._handleFocusout);
+    this._listenerCleanups?.forEach((current) => current());
     this._destroyed.next();
     this._destroyed.complete();
     this._isDestroyed = true;
@@ -1712,7 +1714,7 @@ var MatSelectionList = class _MatSelectionList extends MatListBase {
     if ((event.keyCode === ENTER || event.keyCode === SPACE) && !this._keyManager.isTyping() && activeItem && !activeItem.disabled) {
       event.preventDefault();
       activeItem._toggleOnInteraction();
-    } else if (event.keyCode === A && this.multiple && !this._keyManager.isTyping() && hasModifierKey(event, "ctrlKey")) {
+    } else if (event.keyCode === A && this.multiple && !this._keyManager.isTyping() && hasModifierKey(event, "ctrlKey", "metaKey")) {
       const shouldSelect = this.options.some((option) => !option.disabled && !option.selected);
       event.preventDefault();
       this._emitChangeEvent(this._setAllOptionsSelected(shouldSelect, true));

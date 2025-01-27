@@ -21,7 +21,7 @@ export interface QuickTrade {
     MaterialFormsModule,
   ],
   templateUrl: './quick-trade.component.html',
-  styleUrls: ['./quick-trade.component.css'],
+  styleUrls: ['./quick-trade.component.scss'],
 })
 export class QuickTradeComponent {
   @Output() tradeSubmitted = new EventEmitter<QuickTrade>();

@@ -1,0 +1,84 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.add-position-dialog {
+  padding: $spacing-xl;
+}
+
+h2 {
+  text-align: center;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  margin-bottom: $spacing-xl;
+}
+
+form {
+  @include flex-column;
+  gap: $spacing-md;
+}
+
+mat-form-field {
+  width: 100%;
+
+  .mat-mdc-form-field-focus-overlay {
+    background-color: $surface;
+  }
+
+  .mdc-text-field--outlined {
+    --mdc-outlined-text-field-container-shape: #{$border-radius-sm};
+  }
+
+  .mat-mdc-form-field-flex {
+    background-color: $surface;
+  }
+}
+
+.dialog-actions {
+  @include flex-between;
+  gap: $spacing-md;
+  margin-top: $spacing-md;
+
+  @include respond-to(sm) {
+    @include flex-column;
+    gap: $spacing-sm;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.error-message {
+  background-color: rgba($error, 0.1);
+  color: $error;
+  padding: $spacing-sm;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-sm;
+  text-align: center;
+  margin-bottom: $spacing-md;
+}
+
+button[mat-flat-button],
+button[mat-stroked-button] {
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-sm;
+}
+
+// Date picker styles
+:host {
+  .mat-datepicker-toggle {
+    color: $text-secondary;
+  }
+
+  .mat-datepicker-toggle-active {
+    color: $primary;
+  }
+
+  .mat-calendar-body-selected {
+    background-color: $primary;
+    color: white;
+  }
+}

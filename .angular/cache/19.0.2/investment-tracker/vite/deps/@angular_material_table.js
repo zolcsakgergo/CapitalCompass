@@ -1,7 +1,7 @@
 import {
   ScrollingModule,
   ViewportRuler
-} from "./chunk-L46ODNTJ.js";
+} from "./chunk-TTD4EIIM.js";
 import {
   DataSource,
   _DisposeViewRepeaterStrategy,
@@ -13,11 +13,11 @@ import {
 import {
   Directionality,
   MatCommonModule
-} from "./chunk-VLMIL6PB.js";
+} from "./chunk-J46PIKW4.js";
 import {
   Platform,
   _isNumberValue
-} from "./chunk-YTCJ5BMF.js";
+} from "./chunk-SYGHJHTX.js";
 import {
   DOCUMENT
 } from "./chunk-FR5GTIZY.js";
@@ -934,12 +934,14 @@ var StickyStyler = class {
   _isBrowser;
   _needsPositionStickyOnElement;
   _positionListener;
+  _tableInjector;
   _elemSizeCache = /* @__PURE__ */ new WeakMap();
   _resizeObserver = globalThis?.ResizeObserver ? new globalThis.ResizeObserver((entries) => this._updateCachedSizes(entries)) : null;
   _updatedStickyColumnsParamsToReplay = [];
   _stickyColumnsReplayTimeout = null;
   _cachedCellWidths = [];
   _borderCellCss;
+  _destroyed = false;
   /**
    * @param _isNativeHtmlTable Whether the sticky logic should be based on a table
    *     that uses the native `<table>` element.
@@ -953,8 +955,9 @@ var StickyStyler = class {
    *     the component stylesheet for _stickCellCss.
    * @param _positionListener A listener that is notified of changes to sticky rows/columns
    *     and their dimensions.
+   * @param _tableInjector The table's Injector.
    */
-  constructor(_isNativeHtmlTable, _stickCellCss, direction, _coalescedStyleScheduler, _isBrowser = true, _needsPositionStickyOnElement = true, _positionListener) {
+  constructor(_isNativeHtmlTable, _stickCellCss, direction, _coalescedStyleScheduler, _isBrowser = true, _needsPositionStickyOnElement = true, _positionListener, _tableInjector) {
     this._isNativeHtmlTable = _isNativeHtmlTable;
     this._stickCellCss = _stickCellCss;
     this.direction = direction;
@@ -962,6 +965,7 @@ var StickyStyler = class {
     this._isBrowser = _isBrowser;
     this._needsPositionStickyOnElement = _needsPositionStickyOnElement;
     this._positionListener = _positionListener;
+    this._tableInjector = _tableInjector;
     this._borderCellCss = {
       "top": `${_stickCellCss}-border-elem-top`,
       "bottom": `${_stickCellCss}-border-elem-bottom`,
@@ -984,14 +988,13 @@ var StickyStyler = class {
       if (row.nodeType !== row.ELEMENT_NODE) {
         continue;
       }
-      elementsToClear.push(row);
-      for (let i = 0; i < row.children.length; i++) {
-        elementsToClear.push(row.children[i]);
-      }
+      elementsToClear.push(row, ...Array.from(row.children));
     }
-    this._coalescedStyleScheduler.schedule(() => {
-      for (const element of elementsToClear) {
-        this._removeStickyStyle(element, stickyDirections);
+    this._afterNextRender({
+      write: () => {
+        for (const element of elementsToClear) {
+          this._removeStickyStyle(element, stickyDirections);
+        }
       }
     });
   }
@@ -1026,35 +1029,42 @@ var StickyStyler = class {
       }
       return;
     }
-    this._coalescedStyleScheduler.schedule(() => {
-      const firstRow = rows[0];
-      const numCells = firstRow.children.length;
-      const cellWidths = this._getCellWidths(firstRow, recalculateCellWidths);
-      const startPositions = this._getStickyStartColumnPositions(cellWidths, stickyStartStates);
-      const endPositions = this._getStickyEndColumnPositions(cellWidths, stickyEndStates);
-      const lastStickyStart = stickyStartStates.lastIndexOf(true);
-      const firstStickyEnd = stickyEndStates.indexOf(true);
-      const isRtl = this.direction === "rtl";
-      const start = isRtl ? "right" : "left";
-      const end = isRtl ? "left" : "right";
-      for (const row of rows) {
-        for (let i = 0; i < numCells; i++) {
-          const cell = row.children[i];
-          if (stickyStartStates[i]) {
-            this._addStickyStyle(cell, start, startPositions[i], i === lastStickyStart);
-          }
-          if (stickyEndStates[i]) {
-            this._addStickyStyle(cell, end, endPositions[i], i === firstStickyEnd);
+    const firstRow = rows[0];
+    const numCells = firstRow.children.length;
+    const isRtl = this.direction === "rtl";
+    const start = isRtl ? "right" : "left";
+    const end = isRtl ? "left" : "right";
+    const lastStickyStart = stickyStartStates.lastIndexOf(true);
+    const firstStickyEnd = stickyEndStates.indexOf(true);
+    let cellWidths;
+    let startPositions;
+    let endPositions;
+    this._afterNextRender({
+      earlyRead: () => {
+        cellWidths = this._getCellWidths(firstRow, recalculateCellWidths);
+        startPositions = this._getStickyStartColumnPositions(cellWidths, stickyStartStates);
+        endPositions = this._getStickyEndColumnPositions(cellWidths, stickyEndStates);
+      },
+      write: () => {
+        for (const row of rows) {
+          for (let i = 0; i < numCells; i++) {
+            const cell = row.children[i];
+            if (stickyStartStates[i]) {
+              this._addStickyStyle(cell, start, startPositions[i], i === lastStickyStart);
+            }
+            if (stickyEndStates[i]) {
+              this._addStickyStyle(cell, end, endPositions[i], i === firstStickyEnd);
+            }
           }
         }
-      }
-      if (this._positionListener) {
-        this._positionListener.stickyColumnsUpdated({
-          sizes: lastStickyStart === -1 ? [] : cellWidths.slice(0, lastStickyStart + 1).map((width, index) => stickyStartStates[index] ? width : null)
-        });
-        this._positionListener.stickyEndColumnsUpdated({
-          sizes: firstStickyEnd === -1 ? [] : cellWidths.slice(firstStickyEnd).map((width, index) => stickyEndStates[index + firstStickyEnd] ? width : null).reverse()
-        });
+        if (this._positionListener) {
+          this._positionListener.stickyColumnsUpdated({
+            sizes: lastStickyStart === -1 ? [] : cellWidths.slice(0, lastStickyStart + 1).map((width, index) => stickyStartStates[index] ? width : null)
+          });
+          this._positionListener.stickyEndColumnsUpdated({
+            sizes: firstStickyEnd === -1 ? [] : cellWidths.slice(firstStickyEnd).map((width, index) => stickyEndStates[index + firstStickyEnd] ? width : null).reverse()
+          });
+        }
       }
     });
   }
@@ -1073,46 +1083,50 @@ var StickyStyler = class {
     if (!this._isBrowser) {
       return;
     }
-    this._coalescedStyleScheduler.schedule(() => {
-      const rows = position === "bottom" ? rowsToStick.slice().reverse() : rowsToStick;
-      const states = position === "bottom" ? stickyStates.slice().reverse() : stickyStates;
-      const stickyOffsets = [];
-      const stickyCellHeights = [];
-      const elementsToStick = [];
-      for (let rowIndex = 0, stickyOffset = 0; rowIndex < rows.length; rowIndex++) {
-        if (!states[rowIndex]) {
-          continue;
+    const rows = position === "bottom" ? rowsToStick.slice().reverse() : rowsToStick;
+    const states = position === "bottom" ? stickyStates.slice().reverse() : stickyStates;
+    const stickyOffsets = [];
+    const stickyCellHeights = [];
+    const elementsToStick = [];
+    this._afterNextRender({
+      earlyRead: () => {
+        for (let rowIndex = 0, stickyOffset = 0; rowIndex < rows.length; rowIndex++) {
+          if (!states[rowIndex]) {
+            continue;
+          }
+          stickyOffsets[rowIndex] = stickyOffset;
+          const row = rows[rowIndex];
+          elementsToStick[rowIndex] = this._isNativeHtmlTable ? Array.from(row.children) : [row];
+          const height = this._retrieveElementSize(row).height;
+          stickyOffset += height;
+          stickyCellHeights[rowIndex] = height;
         }
-        stickyOffsets[rowIndex] = stickyOffset;
-        const row = rows[rowIndex];
-        elementsToStick[rowIndex] = this._isNativeHtmlTable ? Array.from(row.children) : [row];
-        const height = this._retrieveElementSize(row).height;
-        stickyOffset += height;
-        stickyCellHeights[rowIndex] = height;
-      }
-      const borderedRowIndex = states.lastIndexOf(true);
-      for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-        if (!states[rowIndex]) {
-          continue;
+      },
+      write: () => {
+        const borderedRowIndex = states.lastIndexOf(true);
+        for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+          if (!states[rowIndex]) {
+            continue;
+          }
+          const offset = stickyOffsets[rowIndex];
+          const isBorderedRowIndex = rowIndex === borderedRowIndex;
+          for (const element of elementsToStick[rowIndex]) {
+            this._addStickyStyle(element, position, offset, isBorderedRowIndex);
+          }
         }
-        const offset = stickyOffsets[rowIndex];
-        const isBorderedRowIndex = rowIndex === borderedRowIndex;
-        for (const element of elementsToStick[rowIndex]) {
-          this._addStickyStyle(element, position, offset, isBorderedRowIndex);
+        if (position === "top") {
+          this._positionListener?.stickyHeaderRowsUpdated({
+            sizes: stickyCellHeights,
+            offsets: stickyOffsets,
+            elements: elementsToStick
+          });
+        } else {
+          this._positionListener?.stickyFooterRowsUpdated({
+            sizes: stickyCellHeights,
+            offsets: stickyOffsets,
+            elements: elementsToStick
+          });
         }
-      }
-      if (position === "top") {
-        this._positionListener?.stickyHeaderRowsUpdated({
-          sizes: stickyCellHeights,
-          offsets: stickyOffsets,
-          elements: elementsToStick
-        });
-      } else {
-        this._positionListener?.stickyFooterRowsUpdated({
-          sizes: stickyCellHeights,
-          offsets: stickyOffsets,
-          elements: elementsToStick
-        });
       }
     });
   }
@@ -1126,16 +1140,25 @@ var StickyStyler = class {
     if (!this._isNativeHtmlTable) {
       return;
     }
-    this._coalescedStyleScheduler.schedule(() => {
-      const tfoot = tableElement.querySelector("tfoot");
-      if (tfoot) {
-        if (stickyStates.some((state) => !state)) {
-          this._removeStickyStyle(tfoot, ["bottom"]);
-        } else {
-          this._addStickyStyle(tfoot, "bottom", 0, false);
+    this._afterNextRender({
+      write: () => {
+        const tfoot = tableElement.querySelector("tfoot");
+        if (tfoot) {
+          if (stickyStates.some((state) => !state)) {
+            this._removeStickyStyle(tfoot, ["bottom"]);
+          } else {
+            this._addStickyStyle(tfoot, "bottom", 0, false);
+          }
         }
       }
     });
+  }
+  /** Triggered by the table's OnDestroy hook. */
+  destroy() {
+    if (this._stickyColumnsReplayTimeout) {
+      clearTimeout(this._stickyColumnsReplayTimeout);
+    }
+    this._destroyed = true;
   }
   /**
    * Removes the sticky style on the element by removing the sticky cell CSS class, re-evaluating
@@ -1309,12 +1332,31 @@ var StickyStyler = class {
         clearTimeout(this._stickyColumnsReplayTimeout);
       }
       this._stickyColumnsReplayTimeout = setTimeout(() => {
+        if (this._destroyed) {
+          return;
+        }
         for (const update of this._updatedStickyColumnsParamsToReplay) {
           this.updateStickyColumns(update.rows, update.stickyStartStates, update.stickyEndStates, true, false);
         }
         this._updatedStickyColumnsParamsToReplay = [];
         this._stickyColumnsReplayTimeout = null;
       }, 0);
+    }
+  }
+  /**
+   * Invoke afterNextRender with the table's injector, falling back to CoalescedStyleScheduler
+   * if the injector was not provided.
+   */
+  _afterNextRender(spec) {
+    if (this._tableInjector) {
+      afterNextRender(spec, {
+        injector: this._tableInjector
+      });
+    } else {
+      this._coalescedStyleScheduler.schedule(() => {
+        spec.earlyRead?.();
+        spec.write();
+      });
     }
   }
 };
@@ -1787,6 +1829,7 @@ var CdkTable = class _CdkTable {
     }
   }
   ngOnDestroy() {
+    this._stickyStyler?.destroy();
     [this._rowOutlet?.viewContainer, this._headerRowOutlet?.viewContainer, this._footerRowOutlet?.viewContainer, this._cachedRenderRowsMap, this._customColumnDefs, this._customRowDefs, this._customHeaderRowDefs, this._customFooterRowDefs, this._columnDefsByName].forEach((def) => {
       def?.clear();
     });
@@ -1829,12 +1872,8 @@ var CdkTable = class _CdkTable {
       rowView.context.$implicit = record.item.data;
     });
     this._updateNoDataRow();
-    afterNextRender(() => {
-      this.updateStickyColumnStyles();
-    }, {
-      injector: this._injector
-    });
     this.contentChanged.next();
+    this.updateStickyColumnStyles();
   }
   /** Adds a column definition that was not included as part of the content children. */
   addColumnDef(columnDef) {
@@ -2153,7 +2192,7 @@ var CdkTable = class _CdkTable {
   }
   /** Adds the sticky column styles for the rows according to the columns' stick states. */
   _addStickyColumnStyles(rows, rowDef) {
-    const columnDefs = Array.from(rowDef.columns || []).map((columnName) => {
+    const columnDefs = Array.from(rowDef?.columns || []).map((columnName) => {
       const columnDef = this._columnDefsByName.get(columnName);
       if (!columnDef && (typeof ngDevMode === "undefined" || ngDevMode)) {
         throw getTableUnknownColumnError(columnName);
@@ -2298,7 +2337,7 @@ var CdkTable = class _CdkTable {
    */
   _setupStickyStyler() {
     const direction = this._dir ? this._dir.value : "ltr";
-    this._stickyStyler = new StickyStyler(this._isNativeHtmlTable, this.stickyCssClass, direction, this._coalescedStyleScheduler, this._platform.isBrowser, this.needsPositionStickyOnElement, this._stickyPositioningListener);
+    this._stickyStyler = new StickyStyler(this._isNativeHtmlTable, this.stickyCssClass, direction, this._coalescedStyleScheduler, this._platform.isBrowser, this.needsPositionStickyOnElement, this._stickyPositioningListener, this._injector);
     (this._dir ? this._dir.change : of()).pipe(takeUntil(this._onDestroy)).subscribe((value) => {
       this._stickyStyler.direction = value;
       this.updateStickyColumnStyles();
@@ -2875,7 +2914,7 @@ var MatTable = class _MatTable extends CdkTable {
       }
     },
     dependencies: [HeaderRowOutlet, DataRowOutlet, NoDataRowOutlet, FooterRowOutlet],
-    styles: [".mat-mdc-table-sticky{position:sticky !important}mat-table{display:block}mat-header-row{min-height:56px}mat-row,mat-footer-row{min-height:48px}mat-row,mat-header-row,mat-footer-row{display:flex;border-width:0;border-bottom-width:1px;border-style:solid;align-items:center;box-sizing:border-box}mat-cell:first-of-type,mat-header-cell:first-of-type,mat-footer-cell:first-of-type{padding-left:24px}[dir=rtl] mat-cell:first-of-type:not(:only-of-type),[dir=rtl] mat-header-cell:first-of-type:not(:only-of-type),[dir=rtl] mat-footer-cell:first-of-type:not(:only-of-type){padding-left:0;padding-right:24px}mat-cell:last-of-type,mat-header-cell:last-of-type,mat-footer-cell:last-of-type{padding-right:24px}[dir=rtl] mat-cell:last-of-type:not(:only-of-type),[dir=rtl] mat-header-cell:last-of-type:not(:only-of-type),[dir=rtl] mat-footer-cell:last-of-type:not(:only-of-type){padding-right:0;padding-left:24px}mat-cell,mat-header-cell,mat-footer-cell{flex:1;display:flex;align-items:center;overflow:hidden;word-wrap:break-word;min-height:inherit}.mat-mdc-table{min-width:100%;border:0;border-spacing:0;table-layout:auto;white-space:normal;background-color:var(--mat-table-background-color, var(--mat-sys-surface))}.mdc-data-table__cell{box-sizing:border-box;overflow:hidden;text-align:left;text-overflow:ellipsis}[dir=rtl] .mdc-data-table__cell{text-align:right}.mdc-data-table__cell,.mdc-data-table__header-cell{padding:0 16px}.mat-mdc-header-row{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;height:var(--mat-table-header-container-height, 56px);color:var(--mat-table-header-headline-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)));font-family:var(--mat-table-header-headline-font, var(--mat-sys-title-small-font, Roboto, sans-serif));line-height:var(--mat-table-header-headline-line-height, var(--mat-sys-title-small-line-height));font-size:var(--mat-table-header-headline-size, var(--mat-sys-title-small-size, 14px));font-weight:var(--mat-table-header-headline-weight, var(--mat-sys-title-small-weight, 500))}.mat-mdc-row{height:var(--mat-table-row-item-container-height, 52px);color:var(--mat-table-row-item-label-text-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)))}.mat-mdc-row,.mdc-data-table__content{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;font-family:var(--mat-table-row-item-label-text-font, var(--mat-sys-body-medium-font, Roboto, sans-serif));line-height:var(--mat-table-row-item-label-text-line-height, var(--mat-sys-body-medium-line-height));font-size:var(--mat-table-row-item-label-text-size, var(--mat-sys-body-medium-size, 14px));font-weight:var(--mat-table-row-item-label-text-weight, var(--mat-sys-body-medium-weight))}.mat-mdc-footer-row{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;height:var(--mat-table-footer-container-height, 52px);color:var(--mat-table-row-item-label-text-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)));font-family:var(--mat-table-footer-supporting-text-font, var(--mat-sys-body-medium-font, Roboto, sans-serif));line-height:var(--mat-table-footer-supporting-text-line-height, var(--mat-sys-body-medium-line-height));font-size:var(--mat-table-footer-supporting-text-size, var(--mat-sys-body-medium-size, 14px));font-weight:var(--mat-table-footer-supporting-text-weight, var(--mat-sys-body-medium-weight));letter-spacing:var(--mat-table-footer-supporting-text-tracking, var(--mat-sys-body-medium-tracking))}.mat-mdc-header-cell{border-bottom-color:var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));border-bottom-width:var(--mat-table-row-item-outline-width, 1px);border-bottom-style:solid;letter-spacing:var(--mat-table-header-headline-tracking, var(--mat-sys-title-small-tracking));font-weight:inherit;line-height:inherit;box-sizing:border-box;text-overflow:ellipsis;overflow:hidden;outline:none;text-align:left}[dir=rtl] .mat-mdc-header-cell{text-align:right}.mat-mdc-cell{border-bottom-color:var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));border-bottom-width:var(--mat-table-row-item-outline-width, 1px);border-bottom-style:solid;letter-spacing:var(--mat-table-row-item-label-text-tracking, var(--mat-sys-body-medium-tracking));line-height:inherit}.mdc-data-table__row:last-child .mat-mdc-cell{border-bottom:none}.mat-mdc-footer-cell{letter-spacing:var(--mat-table-row-item-label-text-tracking, var(--mat-sys-body-medium-tracking))}mat-row.mat-mdc-row,mat-header-row.mat-mdc-header-row,mat-footer-row.mat-mdc-footer-row{border-bottom:none}.mat-mdc-table tbody,.mat-mdc-table tfoot,.mat-mdc-table thead,.mat-mdc-cell,.mat-mdc-footer-cell,.mat-mdc-header-row,.mat-mdc-row,.mat-mdc-footer-row,.mat-mdc-table .mat-mdc-header-cell{background:inherit}.mat-mdc-table mat-header-row.mat-mdc-header-row,.mat-mdc-table mat-row.mat-mdc-row,.mat-mdc-table mat-footer-row.mat-mdc-footer-cell{height:unset}mat-header-cell.mat-mdc-header-cell,mat-cell.mat-mdc-cell,mat-footer-cell.mat-mdc-footer-cell{align-self:stretch}"],
+    styles: [".mat-mdc-table-sticky{position:sticky !important}mat-table{display:block}mat-header-row{min-height:56px}mat-row,mat-footer-row{min-height:48px}mat-row,mat-header-row,mat-footer-row{display:flex;border-width:0;border-bottom-width:1px;border-style:solid;align-items:center;box-sizing:border-box}mat-cell:first-of-type,mat-header-cell:first-of-type,mat-footer-cell:first-of-type{padding-left:24px}[dir=rtl] mat-cell:first-of-type:not(:only-of-type),[dir=rtl] mat-header-cell:first-of-type:not(:only-of-type),[dir=rtl] mat-footer-cell:first-of-type:not(:only-of-type){padding-left:0;padding-right:24px}mat-cell:last-of-type,mat-header-cell:last-of-type,mat-footer-cell:last-of-type{padding-right:24px}[dir=rtl] mat-cell:last-of-type:not(:only-of-type),[dir=rtl] mat-header-cell:last-of-type:not(:only-of-type),[dir=rtl] mat-footer-cell:last-of-type:not(:only-of-type){padding-right:0;padding-left:24px}mat-cell,mat-header-cell,mat-footer-cell{flex:1;display:flex;align-items:center;overflow:hidden;word-wrap:break-word;min-height:inherit}.mat-mdc-table{min-width:100%;border:0;border-spacing:0;table-layout:auto;white-space:normal;background-color:var(--mat-table-background-color, var(--mat-sys-surface))}.mdc-data-table__cell{box-sizing:border-box;overflow:hidden;text-align:left;text-overflow:ellipsis}[dir=rtl] .mdc-data-table__cell{text-align:right}.mdc-data-table__cell,.mdc-data-table__header-cell{padding:0 16px}.mat-mdc-header-row{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;height:var(--mat-table-header-container-height, 56px);color:var(--mat-table-header-headline-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)));font-family:var(--mat-table-header-headline-font, var(--mat-sys-title-small-font, Roboto, sans-serif));line-height:var(--mat-table-header-headline-line-height, var(--mat-sys-title-small-line-height));font-size:var(--mat-table-header-headline-size, var(--mat-sys-title-small-size, 14px));font-weight:var(--mat-table-header-headline-weight, var(--mat-sys-title-small-weight, 500))}.mat-mdc-row{height:var(--mat-table-row-item-container-height, 52px);color:var(--mat-table-row-item-label-text-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)))}.mat-mdc-row,.mdc-data-table__content{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;font-family:var(--mat-table-row-item-label-text-font, var(--mat-sys-body-medium-font, Roboto, sans-serif));line-height:var(--mat-table-row-item-label-text-line-height, var(--mat-sys-body-medium-line-height));font-size:var(--mat-table-row-item-label-text-size, var(--mat-sys-body-medium-size, 14px));font-weight:var(--mat-table-row-item-label-text-weight, var(--mat-sys-body-medium-weight))}.mat-mdc-footer-row{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;height:var(--mat-table-footer-container-height, 52px);color:var(--mat-table-row-item-label-text-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)));font-family:var(--mat-table-footer-supporting-text-font, var(--mat-sys-body-medium-font, Roboto, sans-serif));line-height:var(--mat-table-footer-supporting-text-line-height, var(--mat-sys-body-medium-line-height));font-size:var(--mat-table-footer-supporting-text-size, var(--mat-sys-body-medium-size, 14px));font-weight:var(--mat-table-footer-supporting-text-weight, var(--mat-sys-body-medium-weight));letter-spacing:var(--mat-table-footer-supporting-text-tracking, var(--mat-sys-body-medium-tracking))}.mat-mdc-header-cell{border-bottom-color:var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));border-bottom-width:var(--mat-table-row-item-outline-width, 1px);border-bottom-style:solid;letter-spacing:var(--mat-table-header-headline-tracking, var(--mat-sys-title-small-tracking));font-weight:inherit;line-height:inherit;box-sizing:border-box;text-overflow:ellipsis;overflow:hidden;outline:none;text-align:left}[dir=rtl] .mat-mdc-header-cell{text-align:right}.mdc-data-table__row:last-child>.mat-mdc-header-cell{border-bottom:none}.mat-mdc-cell{border-bottom-color:var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));border-bottom-width:var(--mat-table-row-item-outline-width, 1px);border-bottom-style:solid;letter-spacing:var(--mat-table-row-item-label-text-tracking, var(--mat-sys-body-medium-tracking));line-height:inherit}.mdc-data-table__row:last-child>.mat-mdc-cell{border-bottom:none}.mat-mdc-footer-cell{letter-spacing:var(--mat-table-row-item-label-text-tracking, var(--mat-sys-body-medium-tracking))}mat-row.mat-mdc-row,mat-header-row.mat-mdc-header-row,mat-footer-row.mat-mdc-footer-row{border-bottom:none}.mat-mdc-table tbody,.mat-mdc-table tfoot,.mat-mdc-table thead,.mat-mdc-cell,.mat-mdc-footer-cell,.mat-mdc-header-row,.mat-mdc-row,.mat-mdc-footer-row,.mat-mdc-table .mat-mdc-header-cell{background:inherit}.mat-mdc-table mat-header-row.mat-mdc-header-row,.mat-mdc-table mat-row.mat-mdc-row,.mat-mdc-table mat-footer-row.mat-mdc-footer-cell{height:unset}mat-header-cell.mat-mdc-header-cell,mat-cell.mat-mdc-cell,mat-footer-cell.mat-mdc-footer-cell{align-self:stretch}"],
     encapsulation: 2
   });
 };
@@ -2947,7 +2986,7 @@ var MatTable = class _MatTable extends CdkTable {
       encapsulation: ViewEncapsulation.None,
       changeDetection: ChangeDetectionStrategy.Default,
       imports: [HeaderRowOutlet, DataRowOutlet, NoDataRowOutlet, FooterRowOutlet],
-      styles: [".mat-mdc-table-sticky{position:sticky !important}mat-table{display:block}mat-header-row{min-height:56px}mat-row,mat-footer-row{min-height:48px}mat-row,mat-header-row,mat-footer-row{display:flex;border-width:0;border-bottom-width:1px;border-style:solid;align-items:center;box-sizing:border-box}mat-cell:first-of-type,mat-header-cell:first-of-type,mat-footer-cell:first-of-type{padding-left:24px}[dir=rtl] mat-cell:first-of-type:not(:only-of-type),[dir=rtl] mat-header-cell:first-of-type:not(:only-of-type),[dir=rtl] mat-footer-cell:first-of-type:not(:only-of-type){padding-left:0;padding-right:24px}mat-cell:last-of-type,mat-header-cell:last-of-type,mat-footer-cell:last-of-type{padding-right:24px}[dir=rtl] mat-cell:last-of-type:not(:only-of-type),[dir=rtl] mat-header-cell:last-of-type:not(:only-of-type),[dir=rtl] mat-footer-cell:last-of-type:not(:only-of-type){padding-right:0;padding-left:24px}mat-cell,mat-header-cell,mat-footer-cell{flex:1;display:flex;align-items:center;overflow:hidden;word-wrap:break-word;min-height:inherit}.mat-mdc-table{min-width:100%;border:0;border-spacing:0;table-layout:auto;white-space:normal;background-color:var(--mat-table-background-color, var(--mat-sys-surface))}.mdc-data-table__cell{box-sizing:border-box;overflow:hidden;text-align:left;text-overflow:ellipsis}[dir=rtl] .mdc-data-table__cell{text-align:right}.mdc-data-table__cell,.mdc-data-table__header-cell{padding:0 16px}.mat-mdc-header-row{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;height:var(--mat-table-header-container-height, 56px);color:var(--mat-table-header-headline-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)));font-family:var(--mat-table-header-headline-font, var(--mat-sys-title-small-font, Roboto, sans-serif));line-height:var(--mat-table-header-headline-line-height, var(--mat-sys-title-small-line-height));font-size:var(--mat-table-header-headline-size, var(--mat-sys-title-small-size, 14px));font-weight:var(--mat-table-header-headline-weight, var(--mat-sys-title-small-weight, 500))}.mat-mdc-row{height:var(--mat-table-row-item-container-height, 52px);color:var(--mat-table-row-item-label-text-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)))}.mat-mdc-row,.mdc-data-table__content{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;font-family:var(--mat-table-row-item-label-text-font, var(--mat-sys-body-medium-font, Roboto, sans-serif));line-height:var(--mat-table-row-item-label-text-line-height, var(--mat-sys-body-medium-line-height));font-size:var(--mat-table-row-item-label-text-size, var(--mat-sys-body-medium-size, 14px));font-weight:var(--mat-table-row-item-label-text-weight, var(--mat-sys-body-medium-weight))}.mat-mdc-footer-row{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;height:var(--mat-table-footer-container-height, 52px);color:var(--mat-table-row-item-label-text-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)));font-family:var(--mat-table-footer-supporting-text-font, var(--mat-sys-body-medium-font, Roboto, sans-serif));line-height:var(--mat-table-footer-supporting-text-line-height, var(--mat-sys-body-medium-line-height));font-size:var(--mat-table-footer-supporting-text-size, var(--mat-sys-body-medium-size, 14px));font-weight:var(--mat-table-footer-supporting-text-weight, var(--mat-sys-body-medium-weight));letter-spacing:var(--mat-table-footer-supporting-text-tracking, var(--mat-sys-body-medium-tracking))}.mat-mdc-header-cell{border-bottom-color:var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));border-bottom-width:var(--mat-table-row-item-outline-width, 1px);border-bottom-style:solid;letter-spacing:var(--mat-table-header-headline-tracking, var(--mat-sys-title-small-tracking));font-weight:inherit;line-height:inherit;box-sizing:border-box;text-overflow:ellipsis;overflow:hidden;outline:none;text-align:left}[dir=rtl] .mat-mdc-header-cell{text-align:right}.mat-mdc-cell{border-bottom-color:var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));border-bottom-width:var(--mat-table-row-item-outline-width, 1px);border-bottom-style:solid;letter-spacing:var(--mat-table-row-item-label-text-tracking, var(--mat-sys-body-medium-tracking));line-height:inherit}.mdc-data-table__row:last-child .mat-mdc-cell{border-bottom:none}.mat-mdc-footer-cell{letter-spacing:var(--mat-table-row-item-label-text-tracking, var(--mat-sys-body-medium-tracking))}mat-row.mat-mdc-row,mat-header-row.mat-mdc-header-row,mat-footer-row.mat-mdc-footer-row{border-bottom:none}.mat-mdc-table tbody,.mat-mdc-table tfoot,.mat-mdc-table thead,.mat-mdc-cell,.mat-mdc-footer-cell,.mat-mdc-header-row,.mat-mdc-row,.mat-mdc-footer-row,.mat-mdc-table .mat-mdc-header-cell{background:inherit}.mat-mdc-table mat-header-row.mat-mdc-header-row,.mat-mdc-table mat-row.mat-mdc-row,.mat-mdc-table mat-footer-row.mat-mdc-footer-cell{height:unset}mat-header-cell.mat-mdc-header-cell,mat-cell.mat-mdc-cell,mat-footer-cell.mat-mdc-footer-cell{align-self:stretch}"]
+      styles: [".mat-mdc-table-sticky{position:sticky !important}mat-table{display:block}mat-header-row{min-height:56px}mat-row,mat-footer-row{min-height:48px}mat-row,mat-header-row,mat-footer-row{display:flex;border-width:0;border-bottom-width:1px;border-style:solid;align-items:center;box-sizing:border-box}mat-cell:first-of-type,mat-header-cell:first-of-type,mat-footer-cell:first-of-type{padding-left:24px}[dir=rtl] mat-cell:first-of-type:not(:only-of-type),[dir=rtl] mat-header-cell:first-of-type:not(:only-of-type),[dir=rtl] mat-footer-cell:first-of-type:not(:only-of-type){padding-left:0;padding-right:24px}mat-cell:last-of-type,mat-header-cell:last-of-type,mat-footer-cell:last-of-type{padding-right:24px}[dir=rtl] mat-cell:last-of-type:not(:only-of-type),[dir=rtl] mat-header-cell:last-of-type:not(:only-of-type),[dir=rtl] mat-footer-cell:last-of-type:not(:only-of-type){padding-right:0;padding-left:24px}mat-cell,mat-header-cell,mat-footer-cell{flex:1;display:flex;align-items:center;overflow:hidden;word-wrap:break-word;min-height:inherit}.mat-mdc-table{min-width:100%;border:0;border-spacing:0;table-layout:auto;white-space:normal;background-color:var(--mat-table-background-color, var(--mat-sys-surface))}.mdc-data-table__cell{box-sizing:border-box;overflow:hidden;text-align:left;text-overflow:ellipsis}[dir=rtl] .mdc-data-table__cell{text-align:right}.mdc-data-table__cell,.mdc-data-table__header-cell{padding:0 16px}.mat-mdc-header-row{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;height:var(--mat-table-header-container-height, 56px);color:var(--mat-table-header-headline-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)));font-family:var(--mat-table-header-headline-font, var(--mat-sys-title-small-font, Roboto, sans-serif));line-height:var(--mat-table-header-headline-line-height, var(--mat-sys-title-small-line-height));font-size:var(--mat-table-header-headline-size, var(--mat-sys-title-small-size, 14px));font-weight:var(--mat-table-header-headline-weight, var(--mat-sys-title-small-weight, 500))}.mat-mdc-row{height:var(--mat-table-row-item-container-height, 52px);color:var(--mat-table-row-item-label-text-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)))}.mat-mdc-row,.mdc-data-table__content{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;font-family:var(--mat-table-row-item-label-text-font, var(--mat-sys-body-medium-font, Roboto, sans-serif));line-height:var(--mat-table-row-item-label-text-line-height, var(--mat-sys-body-medium-line-height));font-size:var(--mat-table-row-item-label-text-size, var(--mat-sys-body-medium-size, 14px));font-weight:var(--mat-table-row-item-label-text-weight, var(--mat-sys-body-medium-weight))}.mat-mdc-footer-row{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;height:var(--mat-table-footer-container-height, 52px);color:var(--mat-table-row-item-label-text-color, var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87)));font-family:var(--mat-table-footer-supporting-text-font, var(--mat-sys-body-medium-font, Roboto, sans-serif));line-height:var(--mat-table-footer-supporting-text-line-height, var(--mat-sys-body-medium-line-height));font-size:var(--mat-table-footer-supporting-text-size, var(--mat-sys-body-medium-size, 14px));font-weight:var(--mat-table-footer-supporting-text-weight, var(--mat-sys-body-medium-weight));letter-spacing:var(--mat-table-footer-supporting-text-tracking, var(--mat-sys-body-medium-tracking))}.mat-mdc-header-cell{border-bottom-color:var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));border-bottom-width:var(--mat-table-row-item-outline-width, 1px);border-bottom-style:solid;letter-spacing:var(--mat-table-header-headline-tracking, var(--mat-sys-title-small-tracking));font-weight:inherit;line-height:inherit;box-sizing:border-box;text-overflow:ellipsis;overflow:hidden;outline:none;text-align:left}[dir=rtl] .mat-mdc-header-cell{text-align:right}.mdc-data-table__row:last-child>.mat-mdc-header-cell{border-bottom:none}.mat-mdc-cell{border-bottom-color:var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));border-bottom-width:var(--mat-table-row-item-outline-width, 1px);border-bottom-style:solid;letter-spacing:var(--mat-table-row-item-label-text-tracking, var(--mat-sys-body-medium-tracking));line-height:inherit}.mdc-data-table__row:last-child>.mat-mdc-cell{border-bottom:none}.mat-mdc-footer-cell{letter-spacing:var(--mat-table-row-item-label-text-tracking, var(--mat-sys-body-medium-tracking))}mat-row.mat-mdc-row,mat-header-row.mat-mdc-header-row,mat-footer-row.mat-mdc-footer-row{border-bottom:none}.mat-mdc-table tbody,.mat-mdc-table tfoot,.mat-mdc-table thead,.mat-mdc-cell,.mat-mdc-footer-cell,.mat-mdc-header-row,.mat-mdc-row,.mat-mdc-footer-row,.mat-mdc-table .mat-mdc-header-cell{background:inherit}.mat-mdc-table mat-header-row.mat-mdc-header-row,.mat-mdc-table mat-row.mat-mdc-row,.mat-mdc-table mat-footer-row.mat-mdc-footer-cell{height:unset}mat-header-cell.mat-mdc-header-cell,mat-cell.mat-mdc-cell,mat-footer-cell.mat-mdc-footer-cell{align-self:stretch}"]
     }]
   }], null, null);
 })();
@@ -3763,11 +3802,8 @@ var MatTableDataSource = class extends DataSource {
    * @returns Whether the filter matches against the data
    */
   filterPredicate = (data, filter) => {
-    const dataStr = Object.keys(data).reduce((currentTerm, key) => {
-      return currentTerm + data[key] + "◬";
-    }, "").toLowerCase();
     const transformedFilter = filter.trim().toLowerCase();
-    return dataStr.indexOf(transformedFilter) != -1;
+    return Object.values(data).some((value) => `${value}`.toLowerCase().includes(transformedFilter));
   };
   constructor(initialData = []) {
     super();

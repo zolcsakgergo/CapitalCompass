@@ -1,0 +1,115 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.sidenav-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 200px;
+  @include flex-column;
+
+  .mat-toolbar {
+    background: inherit;
+  }
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: $z-index-drawer;
+}
+
+.profile-container {
+  padding: $spacing-lg;
+  max-width: 800px;
+  margin: 0 auto;
+
+  @include respond-to(sm) {
+    padding: $spacing-md;
+  }
+}
+
+.profile-card {
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-md;
+}
+
+.profile-info {
+  margin-top: $spacing-lg;
+}
+
+.info-row {
+  padding: $spacing-md 0;
+  @include flex-center;
+
+  .label {
+    font-weight: $font-weight-medium;
+    width: 150px;
+    color: $text-secondary;
+  }
+
+  .value {
+    flex: 1;
+    color: $text-primary;
+  }
+}
+
+.active {
+  background-color: rgba($text-primary, 0.1);
+}
+
+mat-toolbar {
+  @include flex-between;
+  align-items: center;
+}
+
+mat-card-header {
+  margin-bottom: $spacing-md;
+}
+
+mat-divider {
+  margin: $spacing-xs 0;
+}
+
+.logout-container {
+  margin-top: auto;
+  padding: $spacing-md;
+
+  button {
+    width: 100%;
+    @include flex-center;
+    gap: $spacing-xs;
+  }
+}
+
+// Material overrides
+mat-form-field {
+  width: 100%;
+  margin-bottom: $spacing-md;
+
+  .mat-mdc-form-field-focus-overlay {
+    background-color: $surface;
+  }
+
+  .mdc-text-field--outlined {
+    --mdc-outlined-text-field-container-shape: #{$border-radius-sm};
+  }
+
+  .mat-mdc-form-field-flex {
+    background-color: $surface;
+  }
+}
+
+// Button styles
+button[mat-flat-button],
+button[mat-stroked-button] {
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-sm;
+
+  mat-icon {
+    margin-right: $spacing-xs;
+  }
+}

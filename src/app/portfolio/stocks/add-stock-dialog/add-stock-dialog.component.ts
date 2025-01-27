@@ -30,7 +30,7 @@ interface StockData {
   ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './add-stock-dialog.component.html',
-  styleUrls: ['./add-stock-dialog.component.css'],
+  styleUrls: ['./add-stock-dialog.component.scss'],
 })
 export class AddStockDialogComponent {
   stock: any = {

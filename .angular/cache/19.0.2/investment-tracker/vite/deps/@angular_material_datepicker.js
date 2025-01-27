@@ -1,6 +1,10 @@
 import {
   MAT_INPUT_VALUE_ACCESSOR
-} from "./chunk-WA3GA4WZ.js";
+} from "./chunk-5SX4PIJ3.js";
+import {
+  MAT_FORM_FIELD,
+  MatFormFieldControl
+} from "./chunk-QUOWBPNE.js";
 import {
   CdkPortalOutlet,
   ComponentPortal,
@@ -10,15 +14,11 @@ import {
   OverlayModule,
   PortalModule,
   TemplatePortal
-} from "./chunk-X2Q2EVKH.js";
+} from "./chunk-LYZNKYRN.js";
 import {
   CdkScrollableModule
-} from "./chunk-L46ODNTJ.js";
+} from "./chunk-TTD4EIIM.js";
 import "./chunk-GSQIO3JL.js";
-import {
-  MAT_FORM_FIELD,
-  MatFormFieldControl
-} from "./chunk-ZNA2SHX2.js";
 import {
   animate,
   keyframes,
@@ -28,11 +28,6 @@ import {
   trigger
 } from "./chunk-XT62CFWC.js";
 import {
-  MatButton,
-  MatButtonModule,
-  MatIconButton
-} from "./chunk-7ZVDX7NW.js";
-import {
   ControlContainer,
   FormGroupDirective,
   NG_VALIDATORS,
@@ -41,6 +36,11 @@ import {
   NgForm,
   Validators
 } from "./chunk-UO2R5JIT.js";
+import {
+  MatButton,
+  MatButtonModule,
+  MatIconButton
+} from "./chunk-JAD33BFI.js";
 import {
   A11yModule,
   BACKSPACE,
@@ -68,13 +68,13 @@ import {
   _StructuralStylesLoader,
   _VisuallyHiddenLoader,
   hasModifierKey
-} from "./chunk-VLMIL6PB.js";
+} from "./chunk-J46PIKW4.js";
 import {
   Platform,
   _getFocusedElementPierceShadowDom,
   coerceStringArray,
   normalizePassiveListenerOptions
-} from "./chunk-YTCJ5BMF.js";
+} from "./chunk-SYGHJHTX.js";
 import {
   DOCUMENT,
   NgClass
@@ -3464,10 +3464,10 @@ var MatDatepickerContent = class _MatDatepickerContent {
   _calendar;
   /**
    * Theme color of the internal calendar. This API is supported in M2 themes
-   * only, it has no effect in M3 themes.
+   * only, it has no effect in M3 themes. For color customization in M3, see https://material.angular.io/components/datepicker/styling.
    *
    * For information on applying color variants in M3, see
-   * https://material.angular.io/guide/theming#using-component-color-variants.
+   * https://material.angular.io/guide/material-2-theming#optional-add-backwards-compatibility-styles-for-color-variants
    */
   color;
   /** Reference to the datepicker that created the overlay. */
@@ -3755,10 +3755,10 @@ var MatDatepickerBase = class _MatDatepickerBase {
   startView = "month";
   /**
    * Theme color of the datepicker's calendar. This API is supported in M2 themes only, it
-   * has no effect in M3 themes.
+   * has no effect in M3 themes. For color customization in M3, see https://material.angular.io/components/datepicker/styling.
    *
    * For information on applying color variants in M3, see
-   * https://material.angular.io/guide/theming#using-component-color-variants.
+   * https://material.angular.io/guide/material-2-theming#optional-add-backwards-compatibility-styles-for-color-variants
    */
   get color() {
     return this._color || (this.datepickerInput ? this.datepickerInput.getThemePalette() : void 0);
@@ -4968,439 +4968,6 @@ var MatDatepickerToggle = class _MatDatepickerToggle {
     }]
   });
 })();
-function _computeAriaAccessibleName(element) {
-  return _computeAriaAccessibleNameInternal(element, true);
-}
-function ssrSafeIsElement(node) {
-  return node.nodeType === Node.ELEMENT_NODE;
-}
-function ssrSafeIsHTMLInputElement(node) {
-  return node.nodeName === "INPUT";
-}
-function ssrSafeIsHTMLTextAreaElement(node) {
-  return node.nodeName === "TEXTAREA";
-}
-function _computeAriaAccessibleNameInternal(currentNode, isDirectlyReferenced) {
-  if (ssrSafeIsElement(currentNode) && isDirectlyReferenced) {
-    const labelledbyIds = currentNode.getAttribute?.("aria-labelledby")?.split(/\s+/g) || [];
-    const validIdRefs = labelledbyIds.reduce((validIds, id) => {
-      const elem = document.getElementById(id);
-      if (elem) {
-        validIds.push(elem);
-      }
-      return validIds;
-    }, []);
-    if (validIdRefs.length) {
-      return validIdRefs.map((idRef) => {
-        return _computeAriaAccessibleNameInternal(idRef, false);
-      }).join(" ");
-    }
-  }
-  if (ssrSafeIsElement(currentNode)) {
-    const ariaLabel = currentNode.getAttribute("aria-label")?.trim();
-    if (ariaLabel) {
-      return ariaLabel;
-    }
-  }
-  if (ssrSafeIsHTMLInputElement(currentNode) || ssrSafeIsHTMLTextAreaElement(currentNode)) {
-    if (currentNode.labels?.length) {
-      return Array.from(currentNode.labels).map((x) => _computeAriaAccessibleNameInternal(x, false)).join(" ");
-    }
-    const placeholder = currentNode.getAttribute("placeholder")?.trim();
-    if (placeholder) {
-      return placeholder;
-    }
-    const title = currentNode.getAttribute("title")?.trim();
-    if (title) {
-      return title;
-    }
-  }
-  return (currentNode.textContent || "").replace(/\s+/g, " ").trim();
-}
-var MAT_DATE_RANGE_INPUT_PARENT = new InjectionToken("MAT_DATE_RANGE_INPUT_PARENT");
-var MatDateRangeInputPartBase = class _MatDateRangeInputPartBase extends MatDatepickerInputBase {
-  _rangeInput = inject(MAT_DATE_RANGE_INPUT_PARENT);
-  _elementRef = inject(ElementRef);
-  _defaultErrorStateMatcher = inject(ErrorStateMatcher);
-  _injector = inject(Injector);
-  _parentForm = inject(NgForm, {
-    optional: true
-  });
-  _parentFormGroup = inject(FormGroupDirective, {
-    optional: true
-  });
-  /**
-   * Form control bound to this input part.
-   * @docs-private
-   */
-  ngControl;
-  _dir = inject(Directionality, {
-    optional: true
-  });
-  _errorStateTracker;
-  /** Object used to control when error messages are shown. */
-  get errorStateMatcher() {
-    return this._errorStateTracker.matcher;
-  }
-  set errorStateMatcher(value) {
-    this._errorStateTracker.matcher = value;
-  }
-  /** Whether the input is in an error state. */
-  get errorState() {
-    return this._errorStateTracker.errorState;
-  }
-  set errorState(value) {
-    this._errorStateTracker.errorState = value;
-  }
-  constructor() {
-    super();
-    this._errorStateTracker = new _ErrorStateTracker(this._defaultErrorStateMatcher, null, this._parentFormGroup, this._parentForm, this.stateChanges);
-  }
-  ngOnInit() {
-    const ngControl = this._injector.get(NgControl, null, {
-      optional: true,
-      self: true
-    });
-    if (ngControl) {
-      this.ngControl = ngControl;
-      this._errorStateTracker.ngControl = ngControl;
-    }
-  }
-  ngDoCheck() {
-    if (this.ngControl) {
-      this.updateErrorState();
-    }
-  }
-  /** Gets whether the input is empty. */
-  isEmpty() {
-    return this._elementRef.nativeElement.value.length === 0;
-  }
-  /** Gets the placeholder of the input. */
-  _getPlaceholder() {
-    return this._elementRef.nativeElement.placeholder;
-  }
-  /** Focuses the input. */
-  focus() {
-    this._elementRef.nativeElement.focus();
-  }
-  /** Gets the value that should be used when mirroring the input's size. */
-  getMirrorValue() {
-    const element = this._elementRef.nativeElement;
-    const value = element.value;
-    return value.length > 0 ? value : element.placeholder;
-  }
-  /** Refreshes the error state of the input. */
-  updateErrorState() {
-    this._errorStateTracker.updateErrorState();
-  }
-  /** Handles `input` events on the input element. */
-  _onInput(value) {
-    super._onInput(value);
-    this._rangeInput._handleChildValueChange();
-  }
-  /** Opens the datepicker associated with the input. */
-  _openPopup() {
-    this._rangeInput._openDatepicker();
-  }
-  /** Gets the minimum date from the range input. */
-  _getMinDate() {
-    return this._rangeInput.min;
-  }
-  /** Gets the maximum date from the range input. */
-  _getMaxDate() {
-    return this._rangeInput.max;
-  }
-  /** Gets the date filter function from the range input. */
-  _getDateFilter() {
-    return this._rangeInput.dateFilter;
-  }
-  _parentDisabled() {
-    return this._rangeInput._groupDisabled;
-  }
-  _shouldHandleChangeEvent({
-    source
-  }) {
-    return source !== this._rangeInput._startInput && source !== this._rangeInput._endInput;
-  }
-  _assignValueProgrammatically(value) {
-    super._assignValueProgrammatically(value);
-    const opposite = this === this._rangeInput._startInput ? this._rangeInput._endInput : this._rangeInput._startInput;
-    opposite?._validatorOnChange();
-  }
-  /** return the ARIA accessible name of the input element */
-  _getAccessibleName() {
-    return _computeAriaAccessibleName(this._elementRef.nativeElement);
-  }
-  static ɵfac = function MatDateRangeInputPartBase_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _MatDateRangeInputPartBase)();
-  };
-  static ɵdir = ɵɵdefineDirective({
-    type: _MatDateRangeInputPartBase,
-    inputs: {
-      errorStateMatcher: "errorStateMatcher"
-    },
-    features: [ɵɵInheritDefinitionFeature]
-  });
-};
-(() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(MatDateRangeInputPartBase, [{
-    type: Directive
-  }], () => [], {
-    errorStateMatcher: [{
-      type: Input
-    }]
-  });
-})();
-var MatStartDate = class _MatStartDate extends MatDateRangeInputPartBase {
-  /** Validator that checks that the start date isn't after the end date. */
-  _startValidator = (control) => {
-    const start = this._dateAdapter.getValidDateOrNull(this._dateAdapter.deserialize(control.value));
-    const end = this._model ? this._model.selection.end : null;
-    return !start || !end || this._dateAdapter.compareDate(start, end) <= 0 ? null : {
-      "matStartDateInvalid": {
-        "end": end,
-        "actual": start
-      }
-    };
-  };
-  _validator = Validators.compose([...super._getValidators(), this._startValidator]);
-  _getValueFromModel(modelValue) {
-    return modelValue.start;
-  }
-  _shouldHandleChangeEvent(change) {
-    if (!super._shouldHandleChangeEvent(change)) {
-      return false;
-    } else {
-      return !change.oldValue?.start ? !!change.selection.start : !change.selection.start || !!this._dateAdapter.compareDate(change.oldValue.start, change.selection.start);
-    }
-  }
-  _assignValueToModel(value) {
-    if (this._model) {
-      const range = new DateRange(value, this._model.selection.end);
-      this._model.updateSelection(range, this);
-    }
-  }
-  _formatValue(value) {
-    super._formatValue(value);
-    this._rangeInput._handleChildValueChange();
-  }
-  _onKeydown(event) {
-    const endInput = this._rangeInput._endInput;
-    const element = this._elementRef.nativeElement;
-    const isLtr = this._dir?.value !== "rtl";
-    if ((event.keyCode === RIGHT_ARROW && isLtr || event.keyCode === LEFT_ARROW && !isLtr) && element.selectionStart === element.value.length && element.selectionEnd === element.value.length) {
-      event.preventDefault();
-      endInput._elementRef.nativeElement.setSelectionRange(0, 0);
-      endInput.focus();
-    } else {
-      super._onKeydown(event);
-    }
-  }
-  static ɵfac = /* @__PURE__ */ (() => {
-    let ɵMatStartDate_BaseFactory;
-    return function MatStartDate_Factory(__ngFactoryType__) {
-      return (ɵMatStartDate_BaseFactory || (ɵMatStartDate_BaseFactory = ɵɵgetInheritedFactory(_MatStartDate)))(__ngFactoryType__ || _MatStartDate);
-    };
-  })();
-  static ɵdir = ɵɵdefineDirective({
-    type: _MatStartDate,
-    selectors: [["input", "matStartDate", ""]],
-    hostAttrs: ["type", "text", 1, "mat-start-date", "mat-date-range-input-inner"],
-    hostVars: 5,
-    hostBindings: function MatStartDate_HostBindings(rf, ctx) {
-      if (rf & 1) {
-        ɵɵlistener("input", function MatStartDate_input_HostBindingHandler($event) {
-          return ctx._onInput($event.target.value);
-        })("change", function MatStartDate_change_HostBindingHandler() {
-          return ctx._onChange();
-        })("keydown", function MatStartDate_keydown_HostBindingHandler($event) {
-          return ctx._onKeydown($event);
-        })("blur", function MatStartDate_blur_HostBindingHandler() {
-          return ctx._onBlur();
-        });
-      }
-      if (rf & 2) {
-        ɵɵhostProperty("disabled", ctx.disabled);
-        ɵɵattribute("aria-haspopup", ctx._rangeInput.rangePicker ? "dialog" : null)("aria-owns", ctx._rangeInput._ariaOwns ? ctx._rangeInput._ariaOwns() : (ctx._rangeInput.rangePicker == null ? null : ctx._rangeInput.rangePicker.opened) && ctx._rangeInput.rangePicker.id || null)("min", ctx._getMinDate() ? ctx._dateAdapter.toIso8601(ctx._getMinDate()) : null)("max", ctx._getMaxDate() ? ctx._dateAdapter.toIso8601(ctx._getMaxDate()) : null);
-      }
-    },
-    outputs: {
-      dateChange: "dateChange",
-      dateInput: "dateInput"
-    },
-    features: [ɵɵProvidersFeature([{
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: _MatStartDate,
-      multi: true
-    }, {
-      provide: NG_VALIDATORS,
-      useExisting: _MatStartDate,
-      multi: true
-    }]), ɵɵInheritDefinitionFeature]
-  });
-};
-(() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(MatStartDate, [{
-    type: Directive,
-    args: [{
-      selector: "input[matStartDate]",
-      host: {
-        "class": "mat-start-date mat-date-range-input-inner",
-        "[disabled]": "disabled",
-        "(input)": "_onInput($event.target.value)",
-        "(change)": "_onChange()",
-        "(keydown)": "_onKeydown($event)",
-        "[attr.aria-haspopup]": '_rangeInput.rangePicker ? "dialog" : null',
-        "[attr.aria-owns]": `_rangeInput._ariaOwns
-        ? _rangeInput._ariaOwns()
-        : (_rangeInput.rangePicker?.opened && _rangeInput.rangePicker.id) || null`,
-        "[attr.min]": "_getMinDate() ? _dateAdapter.toIso8601(_getMinDate()) : null",
-        "[attr.max]": "_getMaxDate() ? _dateAdapter.toIso8601(_getMaxDate()) : null",
-        "(blur)": "_onBlur()",
-        "type": "text"
-      },
-      providers: [{
-        provide: NG_VALUE_ACCESSOR,
-        useExisting: MatStartDate,
-        multi: true
-      }, {
-        provide: NG_VALIDATORS,
-        useExisting: MatStartDate,
-        multi: true
-      }],
-      // These need to be specified explicitly, because some tooling doesn't
-      // seem to pick them up from the base class. See #20932.
-      outputs: ["dateChange", "dateInput"]
-    }]
-  }], null, null);
-})();
-var MatEndDate = class _MatEndDate extends MatDateRangeInputPartBase {
-  /** Validator that checks that the end date isn't before the start date. */
-  _endValidator = (control) => {
-    const end = this._dateAdapter.getValidDateOrNull(this._dateAdapter.deserialize(control.value));
-    const start = this._model ? this._model.selection.start : null;
-    return !end || !start || this._dateAdapter.compareDate(end, start) >= 0 ? null : {
-      "matEndDateInvalid": {
-        "start": start,
-        "actual": end
-      }
-    };
-  };
-  _validator = Validators.compose([...super._getValidators(), this._endValidator]);
-  _getValueFromModel(modelValue) {
-    return modelValue.end;
-  }
-  _shouldHandleChangeEvent(change) {
-    if (!super._shouldHandleChangeEvent(change)) {
-      return false;
-    } else {
-      return !change.oldValue?.end ? !!change.selection.end : !change.selection.end || !!this._dateAdapter.compareDate(change.oldValue.end, change.selection.end);
-    }
-  }
-  _assignValueToModel(value) {
-    if (this._model) {
-      const range = new DateRange(this._model.selection.start, value);
-      this._model.updateSelection(range, this);
-    }
-  }
-  _moveCaretToEndOfStartInput() {
-    const startInput = this._rangeInput._startInput._elementRef.nativeElement;
-    const value = startInput.value;
-    if (value.length > 0) {
-      startInput.setSelectionRange(value.length, value.length);
-    }
-    startInput.focus();
-  }
-  _onKeydown(event) {
-    const element = this._elementRef.nativeElement;
-    const isLtr = this._dir?.value !== "rtl";
-    if (event.keyCode === BACKSPACE && !element.value) {
-      this._moveCaretToEndOfStartInput();
-    } else if ((event.keyCode === LEFT_ARROW && isLtr || event.keyCode === RIGHT_ARROW && !isLtr) && element.selectionStart === 0 && element.selectionEnd === 0) {
-      event.preventDefault();
-      this._moveCaretToEndOfStartInput();
-    } else {
-      super._onKeydown(event);
-    }
-  }
-  static ɵfac = /* @__PURE__ */ (() => {
-    let ɵMatEndDate_BaseFactory;
-    return function MatEndDate_Factory(__ngFactoryType__) {
-      return (ɵMatEndDate_BaseFactory || (ɵMatEndDate_BaseFactory = ɵɵgetInheritedFactory(_MatEndDate)))(__ngFactoryType__ || _MatEndDate);
-    };
-  })();
-  static ɵdir = ɵɵdefineDirective({
-    type: _MatEndDate,
-    selectors: [["input", "matEndDate", ""]],
-    hostAttrs: ["type", "text", 1, "mat-end-date", "mat-date-range-input-inner"],
-    hostVars: 5,
-    hostBindings: function MatEndDate_HostBindings(rf, ctx) {
-      if (rf & 1) {
-        ɵɵlistener("input", function MatEndDate_input_HostBindingHandler($event) {
-          return ctx._onInput($event.target.value);
-        })("change", function MatEndDate_change_HostBindingHandler() {
-          return ctx._onChange();
-        })("keydown", function MatEndDate_keydown_HostBindingHandler($event) {
-          return ctx._onKeydown($event);
-        })("blur", function MatEndDate_blur_HostBindingHandler() {
-          return ctx._onBlur();
-        });
-      }
-      if (rf & 2) {
-        ɵɵhostProperty("disabled", ctx.disabled);
-        ɵɵattribute("aria-haspopup", ctx._rangeInput.rangePicker ? "dialog" : null)("aria-owns", ctx._rangeInput._ariaOwns ? ctx._rangeInput._ariaOwns() : (ctx._rangeInput.rangePicker == null ? null : ctx._rangeInput.rangePicker.opened) && ctx._rangeInput.rangePicker.id || null)("min", ctx._getMinDate() ? ctx._dateAdapter.toIso8601(ctx._getMinDate()) : null)("max", ctx._getMaxDate() ? ctx._dateAdapter.toIso8601(ctx._getMaxDate()) : null);
-      }
-    },
-    outputs: {
-      dateChange: "dateChange",
-      dateInput: "dateInput"
-    },
-    features: [ɵɵProvidersFeature([{
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: _MatEndDate,
-      multi: true
-    }, {
-      provide: NG_VALIDATORS,
-      useExisting: _MatEndDate,
-      multi: true
-    }]), ɵɵInheritDefinitionFeature]
-  });
-};
-(() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(MatEndDate, [{
-    type: Directive,
-    args: [{
-      selector: "input[matEndDate]",
-      host: {
-        "class": "mat-end-date mat-date-range-input-inner",
-        "[disabled]": "disabled",
-        "(input)": "_onInput($event.target.value)",
-        "(change)": "_onChange()",
-        "(keydown)": "_onKeydown($event)",
-        "[attr.aria-haspopup]": '_rangeInput.rangePicker ? "dialog" : null',
-        "[attr.aria-owns]": `_rangeInput._ariaOwns
-        ? _rangeInput._ariaOwns()
-        : (_rangeInput.rangePicker?.opened && _rangeInput.rangePicker.id) || null`,
-        "[attr.min]": "_getMinDate() ? _dateAdapter.toIso8601(_getMinDate()) : null",
-        "[attr.max]": "_getMaxDate() ? _dateAdapter.toIso8601(_getMaxDate()) : null",
-        "(blur)": "_onBlur()",
-        "type": "text"
-      },
-      providers: [{
-        provide: NG_VALUE_ACCESSOR,
-        useExisting: MatEndDate,
-        multi: true
-      }, {
-        provide: NG_VALIDATORS,
-        useExisting: MatEndDate,
-        multi: true
-      }],
-      // These need to be specified explicitly, because some tooling doesn't
-      // seem to pick them up from the base class. See #20932.
-      outputs: ["dateChange", "dateInput"]
-    }]
-  }], null, null);
-})();
 var MatDateRangeInput = class _MatDateRangeInput {
   _changeDetectorRef = inject(ChangeDetectorRef);
   _elementRef = inject(ElementRef);
@@ -5412,6 +4979,8 @@ var MatDateRangeInput = class _MatDateRangeInput {
   });
   _closedSubscription = Subscription.EMPTY;
   _openedSubscription = Subscription.EMPTY;
+  _startInput;
+  _endInput;
   /** Current value of the range input. */
   get value() {
     return this._model ? this._model.selection : null;
@@ -5545,8 +5114,6 @@ var MatDateRangeInput = class _MatDateRangeInput {
   comparisonStart = null;
   /** End of the comparison range that should be shown in the calendar. */
   comparisonEnd = null;
-  _startInput;
-  _endInput;
   /**
    * Implemented as a part of `MatFormFieldControl`.
    * TODO(crisbeto): change type to `AbstractControlDirective` after #18206 lands.
@@ -5702,17 +5269,6 @@ var MatDateRangeInput = class _MatDateRangeInput {
   static ɵcmp = ɵɵdefineComponent({
     type: _MatDateRangeInput,
     selectors: [["mat-date-range-input"]],
-    contentQueries: function MatDateRangeInput_ContentQueries(rf, ctx, dirIndex) {
-      if (rf & 1) {
-        ɵɵcontentQuery(dirIndex, MatStartDate, 5);
-        ɵɵcontentQuery(dirIndex, MatEndDate, 5);
-      }
-      if (rf & 2) {
-        let _t;
-        ɵɵqueryRefresh(_t = ɵɵloadQuery()) && (ctx._startInput = _t.first);
-        ɵɵqueryRefresh(_t = ɵɵloadQuery()) && (ctx._endInput = _t.first);
-      }
-    },
     hostAttrs: ["role", "group", 1, "mat-date-range-input"],
     hostVars: 8,
     hostBindings: function MatDateRangeInput_HostBindings(rf, ctx) {
@@ -5735,9 +5291,6 @@ var MatDateRangeInput = class _MatDateRangeInput {
     exportAs: ["matDateRangeInput"],
     features: [ɵɵProvidersFeature([{
       provide: MatFormFieldControl,
-      useExisting: _MatDateRangeInput
-    }, {
-      provide: MAT_DATE_RANGE_INPUT_PARENT,
       useExisting: _MatDateRangeInput
     }]), ɵɵInputTransformsFeature, ɵɵNgOnChangesFeature],
     ngContentSelectors: _c6,
@@ -5805,9 +5358,6 @@ var MatDateRangeInput = class _MatDateRangeInput {
       providers: [{
         provide: MatFormFieldControl,
         useExisting: MatDateRangeInput
-      }, {
-        provide: MAT_DATE_RANGE_INPUT_PARENT,
-        useExisting: MatDateRangeInput
       }],
       imports: [CdkMonitorFocus],
       template: `<div
@@ -5869,16 +5419,449 @@ var MatDateRangeInput = class _MatDateRangeInput {
     }],
     comparisonEnd: [{
       type: Input
-    }],
-    _startInput: [{
-      type: ContentChild,
-      args: [MatStartDate]
-    }],
-    _endInput: [{
-      type: ContentChild,
-      args: [MatEndDate]
     }]
   });
+})();
+function _computeAriaAccessibleName(element) {
+  return _computeAriaAccessibleNameInternal(element, true);
+}
+function ssrSafeIsElement(node) {
+  return node.nodeType === Node.ELEMENT_NODE;
+}
+function ssrSafeIsHTMLInputElement(node) {
+  return node.nodeName === "INPUT";
+}
+function ssrSafeIsHTMLTextAreaElement(node) {
+  return node.nodeName === "TEXTAREA";
+}
+function _computeAriaAccessibleNameInternal(currentNode, isDirectlyReferenced) {
+  if (ssrSafeIsElement(currentNode) && isDirectlyReferenced) {
+    const labelledbyIds = currentNode.getAttribute?.("aria-labelledby")?.split(/\s+/g) || [];
+    const validIdRefs = labelledbyIds.reduce((validIds, id) => {
+      const elem = document.getElementById(id);
+      if (elem) {
+        validIds.push(elem);
+      }
+      return validIds;
+    }, []);
+    if (validIdRefs.length) {
+      return validIdRefs.map((idRef) => {
+        return _computeAriaAccessibleNameInternal(idRef, false);
+      }).join(" ");
+    }
+  }
+  if (ssrSafeIsElement(currentNode)) {
+    const ariaLabel = currentNode.getAttribute("aria-label")?.trim();
+    if (ariaLabel) {
+      return ariaLabel;
+    }
+  }
+  if (ssrSafeIsHTMLInputElement(currentNode) || ssrSafeIsHTMLTextAreaElement(currentNode)) {
+    if (currentNode.labels?.length) {
+      return Array.from(currentNode.labels).map((x) => _computeAriaAccessibleNameInternal(x, false)).join(" ");
+    }
+    const placeholder = currentNode.getAttribute("placeholder")?.trim();
+    if (placeholder) {
+      return placeholder;
+    }
+    const title = currentNode.getAttribute("title")?.trim();
+    if (title) {
+      return title;
+    }
+  }
+  return (currentNode.textContent || "").replace(/\s+/g, " ").trim();
+}
+var MatDateRangeInputPartBase = class _MatDateRangeInputPartBase extends MatDatepickerInputBase {
+  _rangeInput = inject(MatDateRangeInput);
+  _elementRef = inject(ElementRef);
+  _defaultErrorStateMatcher = inject(ErrorStateMatcher);
+  _injector = inject(Injector);
+  _parentForm = inject(NgForm, {
+    optional: true
+  });
+  _parentFormGroup = inject(FormGroupDirective, {
+    optional: true
+  });
+  /**
+   * Form control bound to this input part.
+   * @docs-private
+   */
+  ngControl;
+  _dir = inject(Directionality, {
+    optional: true
+  });
+  _errorStateTracker;
+  /** Object used to control when error messages are shown. */
+  get errorStateMatcher() {
+    return this._errorStateTracker.matcher;
+  }
+  set errorStateMatcher(value) {
+    this._errorStateTracker.matcher = value;
+  }
+  /** Whether the input is in an error state. */
+  get errorState() {
+    return this._errorStateTracker.errorState;
+  }
+  set errorState(value) {
+    this._errorStateTracker.errorState = value;
+  }
+  constructor() {
+    super();
+    this._errorStateTracker = new _ErrorStateTracker(this._defaultErrorStateMatcher, null, this._parentFormGroup, this._parentForm, this.stateChanges);
+  }
+  ngOnInit() {
+    const ngControl = this._injector.get(NgControl, null, {
+      optional: true,
+      self: true
+    });
+    if (ngControl) {
+      this.ngControl = ngControl;
+      this._errorStateTracker.ngControl = ngControl;
+    }
+  }
+  ngAfterContentInit() {
+    this._register();
+  }
+  ngDoCheck() {
+    if (this.ngControl) {
+      this.updateErrorState();
+    }
+  }
+  /** Gets whether the input is empty. */
+  isEmpty() {
+    return this._elementRef.nativeElement.value.length === 0;
+  }
+  /** Gets the placeholder of the input. */
+  _getPlaceholder() {
+    return this._elementRef.nativeElement.placeholder;
+  }
+  /** Focuses the input. */
+  focus() {
+    this._elementRef.nativeElement.focus();
+  }
+  /** Gets the value that should be used when mirroring the input's size. */
+  getMirrorValue() {
+    const element = this._elementRef.nativeElement;
+    const value = element.value;
+    return value.length > 0 ? value : element.placeholder;
+  }
+  /** Refreshes the error state of the input. */
+  updateErrorState() {
+    this._errorStateTracker.updateErrorState();
+  }
+  /** Handles `input` events on the input element. */
+  _onInput(value) {
+    super._onInput(value);
+    this._rangeInput._handleChildValueChange();
+  }
+  /** Opens the datepicker associated with the input. */
+  _openPopup() {
+    this._rangeInput._openDatepicker();
+  }
+  /** Gets the minimum date from the range input. */
+  _getMinDate() {
+    return this._rangeInput.min;
+  }
+  /** Gets the maximum date from the range input. */
+  _getMaxDate() {
+    return this._rangeInput.max;
+  }
+  /** Gets the date filter function from the range input. */
+  _getDateFilter() {
+    return this._rangeInput.dateFilter;
+  }
+  _parentDisabled() {
+    return this._rangeInput._groupDisabled;
+  }
+  _shouldHandleChangeEvent({
+    source
+  }) {
+    return source !== this._rangeInput._startInput && source !== this._rangeInput._endInput;
+  }
+  _assignValueProgrammatically(value) {
+    super._assignValueProgrammatically(value);
+    const opposite = this === this._rangeInput._startInput ? this._rangeInput._endInput : this._rangeInput._startInput;
+    opposite?._validatorOnChange();
+  }
+  /** return the ARIA accessible name of the input element */
+  _getAccessibleName() {
+    return _computeAriaAccessibleName(this._elementRef.nativeElement);
+  }
+  static ɵfac = function MatDateRangeInputPartBase_Factory(__ngFactoryType__) {
+    return new (__ngFactoryType__ || _MatDateRangeInputPartBase)();
+  };
+  static ɵdir = ɵɵdefineDirective({
+    type: _MatDateRangeInputPartBase,
+    inputs: {
+      errorStateMatcher: "errorStateMatcher"
+    },
+    features: [ɵɵInheritDefinitionFeature]
+  });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(MatDateRangeInputPartBase, [{
+    type: Directive
+  }], () => [], {
+    errorStateMatcher: [{
+      type: Input
+    }]
+  });
+})();
+var MatStartDate = class _MatStartDate extends MatDateRangeInputPartBase {
+  /** Validator that checks that the start date isn't after the end date. */
+  _startValidator = (control) => {
+    const start = this._dateAdapter.getValidDateOrNull(this._dateAdapter.deserialize(control.value));
+    const end = this._model ? this._model.selection.end : null;
+    return !start || !end || this._dateAdapter.compareDate(start, end) <= 0 ? null : {
+      "matStartDateInvalid": {
+        "end": end,
+        "actual": start
+      }
+    };
+  };
+  _validator = Validators.compose([...super._getValidators(), this._startValidator]);
+  _register() {
+    this._rangeInput._startInput = this;
+  }
+  _getValueFromModel(modelValue) {
+    return modelValue.start;
+  }
+  _shouldHandleChangeEvent(change) {
+    if (!super._shouldHandleChangeEvent(change)) {
+      return false;
+    } else {
+      return !change.oldValue?.start ? !!change.selection.start : !change.selection.start || !!this._dateAdapter.compareDate(change.oldValue.start, change.selection.start);
+    }
+  }
+  _assignValueToModel(value) {
+    if (this._model) {
+      const range = new DateRange(value, this._model.selection.end);
+      this._model.updateSelection(range, this);
+    }
+  }
+  _formatValue(value) {
+    super._formatValue(value);
+    this._rangeInput._handleChildValueChange();
+  }
+  _onKeydown(event) {
+    const endInput = this._rangeInput._endInput;
+    const element = this._elementRef.nativeElement;
+    const isLtr = this._dir?.value !== "rtl";
+    if ((event.keyCode === RIGHT_ARROW && isLtr || event.keyCode === LEFT_ARROW && !isLtr) && element.selectionStart === element.value.length && element.selectionEnd === element.value.length) {
+      event.preventDefault();
+      endInput._elementRef.nativeElement.setSelectionRange(0, 0);
+      endInput.focus();
+    } else {
+      super._onKeydown(event);
+    }
+  }
+  static ɵfac = /* @__PURE__ */ (() => {
+    let ɵMatStartDate_BaseFactory;
+    return function MatStartDate_Factory(__ngFactoryType__) {
+      return (ɵMatStartDate_BaseFactory || (ɵMatStartDate_BaseFactory = ɵɵgetInheritedFactory(_MatStartDate)))(__ngFactoryType__ || _MatStartDate);
+    };
+  })();
+  static ɵdir = ɵɵdefineDirective({
+    type: _MatStartDate,
+    selectors: [["input", "matStartDate", ""]],
+    hostAttrs: ["type", "text", 1, "mat-start-date", "mat-date-range-input-inner"],
+    hostVars: 5,
+    hostBindings: function MatStartDate_HostBindings(rf, ctx) {
+      if (rf & 1) {
+        ɵɵlistener("input", function MatStartDate_input_HostBindingHandler($event) {
+          return ctx._onInput($event.target.value);
+        })("change", function MatStartDate_change_HostBindingHandler() {
+          return ctx._onChange();
+        })("keydown", function MatStartDate_keydown_HostBindingHandler($event) {
+          return ctx._onKeydown($event);
+        })("blur", function MatStartDate_blur_HostBindingHandler() {
+          return ctx._onBlur();
+        });
+      }
+      if (rf & 2) {
+        ɵɵhostProperty("disabled", ctx.disabled);
+        ɵɵattribute("aria-haspopup", ctx._rangeInput.rangePicker ? "dialog" : null)("aria-owns", ctx._rangeInput._ariaOwns ? ctx._rangeInput._ariaOwns() : (ctx._rangeInput.rangePicker == null ? null : ctx._rangeInput.rangePicker.opened) && ctx._rangeInput.rangePicker.id || null)("min", ctx._getMinDate() ? ctx._dateAdapter.toIso8601(ctx._getMinDate()) : null)("max", ctx._getMaxDate() ? ctx._dateAdapter.toIso8601(ctx._getMaxDate()) : null);
+      }
+    },
+    outputs: {
+      dateChange: "dateChange",
+      dateInput: "dateInput"
+    },
+    features: [ɵɵProvidersFeature([{
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: _MatStartDate,
+      multi: true
+    }, {
+      provide: NG_VALIDATORS,
+      useExisting: _MatStartDate,
+      multi: true
+    }]), ɵɵInheritDefinitionFeature]
+  });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(MatStartDate, [{
+    type: Directive,
+    args: [{
+      selector: "input[matStartDate]",
+      host: {
+        "class": "mat-start-date mat-date-range-input-inner",
+        "[disabled]": "disabled",
+        "(input)": "_onInput($event.target.value)",
+        "(change)": "_onChange()",
+        "(keydown)": "_onKeydown($event)",
+        "[attr.aria-haspopup]": '_rangeInput.rangePicker ? "dialog" : null',
+        "[attr.aria-owns]": `_rangeInput._ariaOwns
+        ? _rangeInput._ariaOwns()
+        : (_rangeInput.rangePicker?.opened && _rangeInput.rangePicker.id) || null`,
+        "[attr.min]": "_getMinDate() ? _dateAdapter.toIso8601(_getMinDate()) : null",
+        "[attr.max]": "_getMaxDate() ? _dateAdapter.toIso8601(_getMaxDate()) : null",
+        "(blur)": "_onBlur()",
+        "type": "text"
+      },
+      providers: [{
+        provide: NG_VALUE_ACCESSOR,
+        useExisting: MatStartDate,
+        multi: true
+      }, {
+        provide: NG_VALIDATORS,
+        useExisting: MatStartDate,
+        multi: true
+      }],
+      // These need to be specified explicitly, because some tooling doesn't
+      // seem to pick them up from the base class. See #20932.
+      outputs: ["dateChange", "dateInput"]
+    }]
+  }], null, null);
+})();
+var MatEndDate = class _MatEndDate extends MatDateRangeInputPartBase {
+  /** Validator that checks that the end date isn't before the start date. */
+  _endValidator = (control) => {
+    const end = this._dateAdapter.getValidDateOrNull(this._dateAdapter.deserialize(control.value));
+    const start = this._model ? this._model.selection.start : null;
+    return !end || !start || this._dateAdapter.compareDate(end, start) >= 0 ? null : {
+      "matEndDateInvalid": {
+        "start": start,
+        "actual": end
+      }
+    };
+  };
+  _register() {
+    this._rangeInput._endInput = this;
+  }
+  _validator = Validators.compose([...super._getValidators(), this._endValidator]);
+  _getValueFromModel(modelValue) {
+    return modelValue.end;
+  }
+  _shouldHandleChangeEvent(change) {
+    if (!super._shouldHandleChangeEvent(change)) {
+      return false;
+    } else {
+      return !change.oldValue?.end ? !!change.selection.end : !change.selection.end || !!this._dateAdapter.compareDate(change.oldValue.end, change.selection.end);
+    }
+  }
+  _assignValueToModel(value) {
+    if (this._model) {
+      const range = new DateRange(this._model.selection.start, value);
+      this._model.updateSelection(range, this);
+    }
+  }
+  _moveCaretToEndOfStartInput() {
+    const startInput = this._rangeInput._startInput._elementRef.nativeElement;
+    const value = startInput.value;
+    if (value.length > 0) {
+      startInput.setSelectionRange(value.length, value.length);
+    }
+    startInput.focus();
+  }
+  _onKeydown(event) {
+    const element = this._elementRef.nativeElement;
+    const isLtr = this._dir?.value !== "rtl";
+    if (event.keyCode === BACKSPACE && !element.value) {
+      this._moveCaretToEndOfStartInput();
+    } else if ((event.keyCode === LEFT_ARROW && isLtr || event.keyCode === RIGHT_ARROW && !isLtr) && element.selectionStart === 0 && element.selectionEnd === 0) {
+      event.preventDefault();
+      this._moveCaretToEndOfStartInput();
+    } else {
+      super._onKeydown(event);
+    }
+  }
+  static ɵfac = /* @__PURE__ */ (() => {
+    let ɵMatEndDate_BaseFactory;
+    return function MatEndDate_Factory(__ngFactoryType__) {
+      return (ɵMatEndDate_BaseFactory || (ɵMatEndDate_BaseFactory = ɵɵgetInheritedFactory(_MatEndDate)))(__ngFactoryType__ || _MatEndDate);
+    };
+  })();
+  static ɵdir = ɵɵdefineDirective({
+    type: _MatEndDate,
+    selectors: [["input", "matEndDate", ""]],
+    hostAttrs: ["type", "text", 1, "mat-end-date", "mat-date-range-input-inner"],
+    hostVars: 5,
+    hostBindings: function MatEndDate_HostBindings(rf, ctx) {
+      if (rf & 1) {
+        ɵɵlistener("input", function MatEndDate_input_HostBindingHandler($event) {
+          return ctx._onInput($event.target.value);
+        })("change", function MatEndDate_change_HostBindingHandler() {
+          return ctx._onChange();
+        })("keydown", function MatEndDate_keydown_HostBindingHandler($event) {
+          return ctx._onKeydown($event);
+        })("blur", function MatEndDate_blur_HostBindingHandler() {
+          return ctx._onBlur();
+        });
+      }
+      if (rf & 2) {
+        ɵɵhostProperty("disabled", ctx.disabled);
+        ɵɵattribute("aria-haspopup", ctx._rangeInput.rangePicker ? "dialog" : null)("aria-owns", ctx._rangeInput._ariaOwns ? ctx._rangeInput._ariaOwns() : (ctx._rangeInput.rangePicker == null ? null : ctx._rangeInput.rangePicker.opened) && ctx._rangeInput.rangePicker.id || null)("min", ctx._getMinDate() ? ctx._dateAdapter.toIso8601(ctx._getMinDate()) : null)("max", ctx._getMaxDate() ? ctx._dateAdapter.toIso8601(ctx._getMaxDate()) : null);
+      }
+    },
+    outputs: {
+      dateChange: "dateChange",
+      dateInput: "dateInput"
+    },
+    features: [ɵɵProvidersFeature([{
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: _MatEndDate,
+      multi: true
+    }, {
+      provide: NG_VALIDATORS,
+      useExisting: _MatEndDate,
+      multi: true
+    }]), ɵɵInheritDefinitionFeature]
+  });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(MatEndDate, [{
+    type: Directive,
+    args: [{
+      selector: "input[matEndDate]",
+      host: {
+        "class": "mat-end-date mat-date-range-input-inner",
+        "[disabled]": "disabled",
+        "(input)": "_onInput($event.target.value)",
+        "(change)": "_onChange()",
+        "(keydown)": "_onKeydown($event)",
+        "[attr.aria-haspopup]": '_rangeInput.rangePicker ? "dialog" : null',
+        "[attr.aria-owns]": `_rangeInput._ariaOwns
+        ? _rangeInput._ariaOwns()
+        : (_rangeInput.rangePicker?.opened && _rangeInput.rangePicker.id) || null`,
+        "[attr.min]": "_getMinDate() ? _dateAdapter.toIso8601(_getMinDate()) : null",
+        "[attr.max]": "_getMaxDate() ? _dateAdapter.toIso8601(_getMaxDate()) : null",
+        "(blur)": "_onBlur()",
+        "type": "text"
+      },
+      providers: [{
+        provide: NG_VALUE_ACCESSOR,
+        useExisting: MatEndDate,
+        multi: true
+      }, {
+        provide: NG_VALIDATORS,
+        useExisting: MatEndDate,
+        multi: true
+      }],
+      // These need to be specified explicitly, because some tooling doesn't
+      // seem to pick them up from the base class. See #20932.
+      outputs: ["dateChange", "dateInput"]
+    }]
+  }], null, null);
 })();
 var MatDateRangePicker = class _MatDateRangePicker extends MatDatepickerBase {
   _forwardContentValues(instance) {

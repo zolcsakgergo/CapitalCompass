@@ -1,0 +1,101 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.transactions-container {
+  padding: $spacing-md;
+  margin: $spacing-md;
+
+  @include respond-to(sm) {
+    padding: $spacing-sm;
+    margin: $spacing-sm;
+  }
+}
+
+table {
+  width: 100%;
+  margin-bottom: $spacing-lg;
+
+  .mat-mdc-header-cell {
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+    padding: $spacing-md;
+  }
+
+  .mat-mdc-cell {
+    padding: $spacing-md;
+  }
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: $spacing-md;
+
+  .mat-mdc-form-field-focus-overlay {
+    background-color: $surface;
+  }
+
+  .mdc-text-field--outlined {
+    --mdc-outlined-text-field-container-shape: #{$border-radius-sm};
+  }
+
+  .mat-mdc-form-field-flex {
+    background-color: $surface;
+  }
+}
+
+.buy {
+  color: $success;
+  font-weight: $font-weight-medium;
+}
+
+.sell {
+  color: $error;
+  font-weight: $font-weight-medium;
+}
+
+// Card styles
+mat-card {
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+
+  mat-card-header {
+    padding: $spacing-md;
+    border-bottom: 1px solid $border;
+  }
+
+  mat-card-content {
+    padding: $spacing-lg;
+  }
+}
+
+// No data state
+.no-data {
+  text-align: center;
+  padding: $spacing-xl;
+  color: $text-secondary;
+}
+
+// Filter section
+.filter-section {
+  @include flex-column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  @include respond-to(md) {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+// Action buttons
+button[mat-flat-button],
+button[mat-stroked-button] {
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-sm;
+
+  mat-icon {
+    margin-right: $spacing-xs;
+  }
+}

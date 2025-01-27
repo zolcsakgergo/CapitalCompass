@@ -78,7 +78,7 @@ export class CacheInterceptor implements HttpInterceptor {
     MatDialogModule,
   ],
   templateUrl: './stocks.component.html',
-  styleUrls: ['./stocks.component.css'],
+  styleUrls: ['./stocks.component.scss'],
 })
 export class StocksComponent implements OnInit, OnDestroy {
   stocks: StockPosition[] = [];

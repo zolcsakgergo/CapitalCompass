@@ -9,10 +9,10 @@ import {
   OverlayRef,
   PortalModule,
   TemplatePortal
-} from "./chunk-X2Q2EVKH.js";
+} from "./chunk-LYZNKYRN.js";
 import {
   CdkScrollable
-} from "./chunk-L46ODNTJ.js";
+} from "./chunk-TTD4EIIM.js";
 import "./chunk-GSQIO3JL.js";
 import {
   animate,
@@ -34,12 +34,12 @@ import {
   MatCommonModule,
   _IdGenerator,
   hasModifierKey
-} from "./chunk-VLMIL6PB.js";
+} from "./chunk-J46PIKW4.js";
 import {
   Platform,
   _getFocusedElementPierceShadowDom,
   coerceNumberProperty
-} from "./chunk-YTCJ5BMF.js";
+} from "./chunk-SYGHJHTX.js";
 import {
   DOCUMENT
 } from "./chunk-FR5GTIZY.js";
@@ -57,6 +57,7 @@ import {
   Input,
   NgModule,
   NgZone,
+  Renderer2,
   TemplateRef,
   ViewChild,
   ViewEncapsulation,
@@ -226,6 +227,7 @@ var CdkDialogContainer = class _CdkDialogContainer extends BasePortalOutlet {
   _ngZone = inject(NgZone);
   _overlayRef = inject(OverlayRef);
   _focusMonitor = inject(FocusMonitor);
+  _renderer = inject(Renderer2);
   _platform = inject(Platform);
   _document = inject(DOCUMENT, {
     optional: true
@@ -343,12 +345,12 @@ var CdkDialogContainer = class _CdkDialogContainer extends BasePortalOutlet {
       element.tabIndex = -1;
       this._ngZone.runOutsideAngular(() => {
         const callback = () => {
-          element.removeEventListener("blur", callback);
-          element.removeEventListener("mousedown", callback);
+          deregisterBlur();
+          deregisterMousedown();
           element.removeAttribute("tabindex");
         };
-        element.addEventListener("blur", callback);
-        element.addEventListener("mousedown", callback);
+        const deregisterBlur = this._renderer.listen(element, "blur", callback);
+        const deregisterMousedown = this._renderer.listen(element, "mousedown", callback);
       });
     }
     element.focus(options);

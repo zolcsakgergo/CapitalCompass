@@ -1,0 +1,89 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.stocks-container {
+  padding: $spacing-lg;
+
+  @include respond-to(sm) {
+    padding: $spacing-md;
+  }
+}
+
+h1 {
+  margin-bottom: $spacing-lg;
+  color: $text-primary;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-medium;
+}
+
+mat-card {
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+
+  mat-card-header {
+    padding: $spacing-md;
+    border-bottom: 1px solid $border;
+  }
+
+  mat-card-content {
+    padding: $spacing-lg;
+  }
+}
+
+.no-data {
+  text-align: center;
+  padding: $spacing-xl;
+  color: $text-secondary;
+}
+
+table {
+  width: 100%;
+  margin-bottom: $spacing-lg;
+
+  .mat-mdc-header-cell {
+    font-weight: $font-weight-medium;
+    color: $text-secondary;
+  }
+
+  .mat-mdc-cell,
+  .mat-mdc-header-cell {
+    padding: $spacing-md;
+  }
+}
+
+.positive {
+  @include status-indicator('positive');
+}
+
+.negative {
+  @include status-indicator('negative');
+}
+
+button {
+  margin-top: $spacing-md;
+
+  mat-icon {
+    margin-right: $spacing-xs;
+  }
+}
+
+.add-button {
+  margin-top: $spacing-lg;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: $spacing-md;
+
+  .mat-mdc-form-field-focus-overlay {
+    background-color: $surface;
+  }
+
+  .mdc-text-field--outlined {
+    --mdc-outlined-text-field-container-shape: #{$border-radius-sm};
+  }
+
+  .mat-mdc-form-field-flex {
+    background-color: $surface;
+  }
+}

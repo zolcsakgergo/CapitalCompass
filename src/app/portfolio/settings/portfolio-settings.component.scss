@@ -1,0 +1,97 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.settings-form {
+  max-width: 600px;
+  margin: $spacing-lg auto;
+  padding: $spacing-md;
+
+  @include respond-to(sm) {
+    padding: $spacing-sm;
+  }
+}
+
+.alert-item {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  margin-bottom: $spacing-md;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.price-alerts {
+  margin: $spacing-lg 0;
+}
+
+.add-alert-btn {
+  margin: $spacing-md 0;
+}
+
+.form-actions {
+  margin-top: $spacing-lg;
+  text-align: right;
+
+  @include respond-to(sm) {
+    @include flex-column;
+    gap: $spacing-sm;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+mat-checkbox {
+  display: block;
+  margin: $spacing-md 0;
+}
+
+mat-form-field {
+  width: 100%;
+
+  .mat-mdc-form-field-focus-overlay {
+    background-color: $surface;
+  }
+
+  .mdc-text-field--outlined {
+    --mdc-outlined-text-field-container-shape: #{$border-radius-sm};
+  }
+
+  .mat-mdc-form-field-flex {
+    background-color: $surface;
+  }
+}
+
+h2 {
+  margin-bottom: $spacing-lg;
+  color: $text-primary;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-medium;
+}
+
+h3 {
+  margin: $spacing-lg 0 $spacing-md;
+  color: $text-primary;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+}
+
+.notifications {
+  margin: $spacing-lg 0;
+}
+
+// Button styles
+button[mat-flat-button],
+button[mat-stroked-button] {
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-sm;
+
+  mat-icon {
+    margin-right: $spacing-xs;
+  }
+}

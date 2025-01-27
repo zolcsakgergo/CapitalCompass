@@ -33,7 +33,7 @@ import {
     RouterLinkActive,
   ],
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css'],
+  styleUrls: ['./profile.component.scss'],
 })
 export class ProfileComponent implements OnInit {
   @ViewChild('drawer') drawer!: MatSidenav;

@@ -38,7 +38,7 @@ interface PortfolioSettings {
     MatCheckboxModule,
   ],
   templateUrl: './portfolio-settings.component.html',
-  styleUrls: ['./portfolio-settings.component.css'],
+  styleUrls: ['./portfolio-settings.component.scss'],
 })
 export class PortfolioSettingsComponent implements OnInit {
   settingsForm: FormGroup;

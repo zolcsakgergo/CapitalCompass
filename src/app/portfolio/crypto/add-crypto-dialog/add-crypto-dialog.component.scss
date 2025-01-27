@@ -1,0 +1,45 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+mat-dialog-content {
+  min-width: 350px;
+  padding: $spacing-md;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: $spacing-md;
+  display: block;
+}
+
+mat-dialog-actions {
+  padding: $spacing-md;
+  gap: $spacing-xs;
+}
+
+form {
+  @include flex-column;
+}
+
+// Material form field overrides
+mat-form-field {
+  .mat-mdc-form-field-focus-overlay {
+    background-color: $surface;
+  }
+
+  .mdc-text-field--outlined {
+    --mdc-outlined-text-field-container-shape: #{$border-radius-sm};
+  }
+
+  .mat-mdc-form-field-flex {
+    background-color: $surface;
+  }
+}
+
+// Dialog button styles
+button[mat-flat-button] {
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-sm;
+}
