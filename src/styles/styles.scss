@@ -1,57 +1,174 @@
 @use '@angular/material' as mat;
-@use 'variables' as *;
-@use 'mixins' as *;
+@use 'variables' as vars;
+@use 'mixins' as mix;
 
 // Global styles
 html,
 body {
   height: 100%;
   margin: 0;
-  font-family: $font-family;
+  font-family: vars.$font-family;
 }
 
 // Core layout classes
 .container {
-  padding: $spacing-md;
-  max-width: $breakpoint-lg;
+  padding: vars.$spacing-md;
+  max-width: vars.$breakpoint-lg;
   margin: 0 auto;
+}
+
+// Typography
+h2 {
+  text-align: center;
+  font-size: vars.$font-size-xl;
+  font-weight: vars.$font-weight-medium;
+  color: vars.$text-primary;
+  margin-bottom: vars.$spacing-xl;
+}
+
+h3 {
+  margin: vars.$spacing-lg 0 vars.$spacing-md;
+  color: vars.$text-primary;
+  font-size: vars.$font-size-lg;
+  font-weight: vars.$font-weight-medium;
 }
 
 // Common utility classes
 .flex-center {
-  @include flex-center;
+  @include mix.flex-center;
 }
 
 .flex-between {
-  @include flex-between;
+  @include mix.flex-between;
 }
 
 .flex-column {
-  @include flex-column;
+  @include mix.flex-column;
 }
 
 // Status indicators
 .positive {
-  color: $success;
+  color: vars.$success;
 }
 .negative {
-  color: $error;
+  color: vars.$error;
 }
 .warning {
-  color: $warning;
+  color: vars.$warning;
 }
 .info {
-  color: $info;
+  color: vars.$info;
 }
 
-// Material overrides
-.mat-mdc-card {
-  @include card;
+// Global Material Styles
+// Form Fields
+.mat-mdc-form-field {
+  width: 100%;
+  margin-bottom: vars.$spacing-md;
+
+  .mat-mdc-form-field-focus-overlay {
+    background-color: vars.$surface;
+  }
+
+  .mdc-text-field--outlined {
+    --mdc-outlined-text-field-container-shape: #{vars.$border-radius-sm};
+  }
+
+  .mat-mdc-form-field-flex {
+    background-color: vars.$surface;
+  }
+}
+
+// Buttons
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-flat-button,
+.mat-mdc-stroked-button {
+  padding: vars.$spacing-sm vars.$spacing-md;
+  font-size: vars.$font-size-base;
+  font-weight: vars.$font-weight-medium;
+  border-radius: vars.$border-radius-sm;
+
+  .mat-icon {
+    margin-right: vars.$spacing-xs;
+  }
+}
+
+// Cards
+.mat-mdc-card.mat-mdc-card {
+  border-radius: vars.$border-radius-lg;
+  box-shadow: vars.$shadow-sm;
+
+  .mat-mdc-card-header {
+    padding: vars.$spacing-md;
+    border-bottom: 1px solid vars.$border;
+  }
+
+  .mat-mdc-card-content {
+    padding: vars.$spacing-lg;
+  }
+}
+
+// Tables
+.mat-mdc-table {
+  width: 100%;
+  margin-bottom: vars.$spacing-lg;
+
+  .mat-mdc-header-cell {
+    font-weight: vars.$font-weight-medium;
+    color: vars.$text-secondary;
+    padding: vars.$spacing-md;
+  }
+
+  .mat-mdc-cell {
+    padding: vars.$spacing-md;
+  }
+
+  .mat-mdc-row:hover {
+    background: rgba(vars.$primary, 0.04);
+  }
+}
+
+// Dialog
+.mat-mdc-dialog-container.mdc-dialog__container {
+  .mdc-dialog__surface {
+    padding: vars.$spacing-xl;
+  }
+
+  .mat-mdc-dialog-content.mat-mdc-dialog-content {
+    padding: vars.$spacing-md;
+  }
+
+  .mat-mdc-dialog-actions.mat-mdc-dialog-actions {
+    padding: vars.$spacing-md;
+    gap: vars.$spacing-xs;
+  }
+}
+
+// Sidenav
+.mat-drawer {
+  width: 250px;
+  background-color: vars.$background;
+  border-right: none;
+  box-shadow: vars.$shadow-md;
+}
+
+// Toolbar
+.mat-toolbar {
+  background: vars.$background;
+  color: vars.$text-primary;
+  box-shadow: vars.$shadow-sm;
 }
 
 // Responsive adjustments
-@include respond-to(sm) {
+@include mix.respond-to(sm) {
   .container {
-    padding: $spacing-sm;
+    padding: vars.$spacing-sm;
+  }
+
+  .mat-mdc-dialog-container.mdc-dialog__container {
+    .mdc-dialog__surface {
+      padding: vars.$spacing-lg;
+    }
   }
 }

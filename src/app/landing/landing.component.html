@@ -8,7 +8,7 @@
 
   <main class="hero-section">
     <div class="content">
-      <h1>Track Your Investments<br />With Confidence</h1>
+      <h1>CapitalCompass</h1>
       <p class="subtitle">
         Simple, powerful tools to monitor and optimize your investment portfolio
       </p>
@@ -17,9 +17,7 @@
         <button mat-raised-button color="primary" (click)="openSignupDialog()">
           {{ isLoggedIn ? 'Go to Portfolio' : 'Get Started' }}
         </button>
-        <button mat-stroked-button color="primary" (click)="learnMore()">
-          Learn More
-        </button>
+        <button mat-stroked-button routerLink="/about">Learn More</button>
       </div>
     </div>
 

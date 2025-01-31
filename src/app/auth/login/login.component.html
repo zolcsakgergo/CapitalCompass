@@ -1,5 +1,10 @@
 <div class="login-dialog">
-  <h2>Login</h2>
+  <div class="dialog-header">
+    <h2>Login</h2>
+    <button mat-icon-button (click)="dialogRef?.close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
   <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
 
@@ -13,8 +18,14 @@
         placeholder="Enter your email"
         required
       />
-      <mat-error *ngIf="loginForm.get('email')?.invalid">
-        {{ getErrorMessage('email') }}
+      <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+        Please enter your email
+      </mat-error>
+      <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+        Please enter a valid email address
+      </mat-error>
+      <mat-error *ngIf="loginForm.get('email')?.hasError('pattern')">
+        Please enter a valid email address
       </mat-error>
     </mat-form-field>
 
@@ -39,8 +50,15 @@
           hidePassword ? 'visibility_off' : 'visibility'
         }}</mat-icon>
       </button>
-      <mat-error *ngIf="loginForm.get('password')?.invalid">
-        {{ getErrorMessage('password') }}
+      <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+        Please enter your password
+      </mat-error>
+      <mat-error *ngIf="loginForm.get('password')?.hasError('minLength')">
+        Password must be at least 12 characters long
+      </mat-error>
+      <mat-error *ngIf="loginForm.get('password')?.hasError('pattern')">
+        Password must contain at least two uppercase letter, one number, and one
+        special character
       </mat-error>
     </mat-form-field>
 

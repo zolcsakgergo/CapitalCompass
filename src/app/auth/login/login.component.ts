@@ -39,7 +39,7 @@ export class LoginComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    @Optional() private dialogRef: MatDialogRef<LoginComponent>,
+    @Optional() public dialogRef: MatDialogRef<LoginComponent>,
     @Optional() private dialog: MatDialog,
   ) {
     this.loginForm = this.fb.group({
@@ -49,6 +49,7 @@ export class LoginComponent {
   }
 
   getErrorMessage(field: string): string {
+    console.log('itt vagyok');
     const control = this.loginForm.get(field);
     if (!control) return '';
 

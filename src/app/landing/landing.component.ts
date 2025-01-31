@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MaterialSharedModule } from '../shared/material-shared.module';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -11,7 +11,7 @@ import { AuthService } from '../auth/auth.service';
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, MaterialSharedModule],
+  imports: [CommonModule, MaterialSharedModule, RouterModule],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
 })

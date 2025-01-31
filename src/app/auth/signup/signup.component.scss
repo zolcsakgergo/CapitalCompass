@@ -1,5 +1,5 @@
-@use 'variables' as *;
-@use 'mixins' as *;
+@use '../../../styles/variables' as vars;
+@use '../../../styles/mixins' as mix;
 @use 'sass:color';
 
 :host {
@@ -16,99 +16,81 @@
   width: 100%;
   background: linear-gradient(
     135deg,
-    $primary 0%,
-    color.adjust($primary, $lightness: -15%) 100%
+    vars.$primary 0%,
+    color.adjust(vars.$primary, $lightness: -15%) 100%
   );
-  padding: $spacing-md;
+  padding: vars.$spacing-md;
 
-  @include respond-to(sm) {
-    padding: $spacing-sm;
+  @include mix.respond-to(sm) {
+    padding: vars.$spacing-sm;
   }
 }
 
 .card {
   width: 100%;
   max-width: 400px;
-  margin: $spacing-md;
-  border-radius: $border-radius-lg !important;
-  padding: $spacing-xl;
-  background-color: $background;
-  box-shadow: $shadow-lg;
+  margin: vars.$spacing-md;
+  padding: vars.$spacing-xl;
 
-  @include respond-to(sm) {
+  @include mix.respond-to(sm) {
     margin: 0;
-    padding: $spacing-lg;
+    padding: vars.$spacing-lg;
   }
-}
-
-h2 {
-  text-align: center;
-  font-size: $font-size-xl;
-  font-weight: $font-weight-medium;
-  color: $text-primary;
-  margin-bottom: $spacing-xl;
 }
 
 form {
-  @include flex-column;
-  gap: $spacing-md;
-}
-
-mat-form-field {
-  width: 100%;
-
-  .mat-mdc-form-field-focus-overlay {
-    background-color: $surface;
-  }
-
-  .mdc-text-field--outlined {
-    --mdc-outlined-text-field-container-shape: #{$border-radius-sm};
-  }
-
-  .mat-mdc-form-field-flex {
-    background-color: $surface;
-  }
-}
-
-button[mat-flat-button] {
-  margin-top: $spacing-xs;
-  padding: $spacing-md;
-  font-size: $font-size-base;
-  font-weight: $font-weight-medium;
-  border-radius: $border-radius-sm;
+  @include mix.flex-column;
+  gap: vars.$spacing-md;
 }
 
 .error-message {
-  background-color: rgba($error, 0.1);
-  color: $error;
-  padding: $spacing-sm;
-  border-radius: $border-radius-sm;
-  font-size: $font-size-sm;
+  background-color: rgba(vars.$error, 0.1);
+  color: vars.$error;
+  padding: vars.$spacing-sm;
+  border-radius: vars.$border-radius-sm;
+  font-size: vars.$font-size-sm;
   text-align: center;
-  margin-bottom: $spacing-md;
+  margin-bottom: vars.$spacing-md;
 }
 
 .success-message {
-  background-color: rgba($success, 0.1);
-  color: $success;
-  padding: $spacing-sm;
-  border-radius: $border-radius-sm;
-  font-size: $font-size-sm;
+  background-color: rgba(vars.$success, 0.1);
+  color: vars.$success;
+  padding: vars.$spacing-sm;
+  border-radius: vars.$border-radius-sm;
+  font-size: vars.$font-size-sm;
   text-align: center;
-  margin-bottom: $spacing-md;
+  margin-bottom: vars.$spacing-md;
 }
 
 .redirect-text {
   text-align: center;
-  margin-top: $spacing-lg;
-  color: $text-secondary;
-  font-size: $font-size-sm;
-}
-
-a[mat-button] {
-  font-weight: $font-weight-medium;
+  margin-top: vars.$spacing-lg;
+  color: vars.$text-secondary;
+  font-size: vars.$font-size-sm;
 }
 
 .signup-dialog {
-  padding: $spacing-xl;
+  padding: vars.$spacing-xl;
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: vars.$spacing-lg;
+
+    h2 {
+      margin: 0;
+    }
+
+    .close-button {
+      margin-right: -12px;
+    }
+  }
+}
+
+.form-actions {
+  margin-top: vars.$spacing-lg;
+  display: flex;
+  justify-content: center;
 }

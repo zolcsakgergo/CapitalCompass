@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
+import { LandingComponent } from './landing/landing.component';
 
 export const routes: Routes = [
   {
@@ -35,8 +36,12 @@ export const routes: Routes = [
   },
   {
     path: '',
+    component: LandingComponent,
+  },
+  {
+    path: 'about',
     loadComponent: () =>
-      import('./landing/landing.component').then(m => m.LandingComponent),
+      import('./about/about.component').then(m => m.AboutComponent),
   },
   { path: '**', redirectTo: '' },
 ];

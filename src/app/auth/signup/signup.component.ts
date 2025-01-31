@@ -39,7 +39,7 @@ export class SignupComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private dialogRef: MatDialogRef<SignupComponent>,
+    public dialogRef: MatDialogRef<SignupComponent>,
     private dialog: MatDialog,
   ) {
     this.signupForm = this.fb.group({

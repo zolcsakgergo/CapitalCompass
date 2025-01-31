@@ -1,5 +1,5 @@
-@use 'variables' as *;
-@use 'mixins' as *;
+@use '../../styles/variables' as vars;
+@use '../../styles/mixins' as mix;
 @use 'sass:color';
 
 .portfolio-wrapper {
@@ -12,8 +12,8 @@
   bottom: 0;
   background: linear-gradient(
     135deg,
-    $primary 0%,
-    color.adjust($primary, $lightness: -15%) 100%
+    vars.$primary 0%,
+    color.adjust(vars.$primary, $lightness: -15%) 100%
   );
   overflow: hidden;
 }
@@ -26,44 +26,44 @@
 
 .sidenav {
   width: 250px;
-  background-color: $background;
+  background-color: vars.$background;
   border-right: none;
-  box-shadow: $shadow-md;
-  @include flex-column;
+  box-shadow: vars.$shadow-md;
+  @include mix.flex-column;
   height: 100%;
 }
 
 mat-toolbar {
-  @include flex-between;
-  gap: $spacing-md;
-  background: $background;
-  color: $text-primary;
-  box-shadow: $shadow-sm;
+  @include mix.flex-between;
+  gap: vars.$spacing-md;
+  background: vars.$background;
+  color: vars.$text-primary;
+  box-shadow: vars.$shadow-sm;
 
-  @include respond-to(md) {
-    padding: 0 $spacing-xs;
+  @include mix.respond-to(md) {
+    padding: 0 vars.$spacing-xs;
   }
 }
 
 mat-sidenav-content {
   background: transparent;
-  @include flex-column;
+  @include mix.flex-column;
   height: 100%;
 }
 
 .content {
   flex: 1;
-  padding: $spacing-md;
+  padding: vars.$spacing-md;
   overflow-y: auto;
   position: relative;
-  background: rgba($background, 0.95);
-  margin: $spacing-md;
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-md;
+  background: rgba(vars.$background, 0.95);
+  margin: vars.$spacing-md;
+  border-radius: vars.$border-radius-lg;
+  box-shadow: vars.$shadow-md;
 
-  @include respond-to(md) {
-    margin: $spacing-sm;
-    padding: $spacing-md;
+  @include mix.respond-to(md) {
+    margin: vars.$spacing-sm;
+    padding: vars.$spacing-md;
   }
 }
 
@@ -73,11 +73,11 @@ mat-nav-list {
 }
 
 .active {
-  background-color: rgba($text-primary, 0.04);
+  background-color: rgba(vars.$text-primary, 0.04);
 }
 
 mat-icon {
-  margin-right: $spacing-xs;
+  margin-right: vars.$spacing-xs;
 }
 
 a[mat-list-item] {
@@ -85,18 +85,18 @@ a[mat-list-item] {
 }
 
 .sidenav-footer {
-  padding: $spacing-md;
-  @include flex-end;
+  padding: vars.$spacing-md;
+  @include mix.flex-end;
 
-  @include respond-to(md) {
-    padding: $spacing-sm;
+  @include mix.respond-to(md) {
+    padding: vars.$spacing-sm;
   }
 }
 
 .logout-button {
   position: relative;
-  margin-bottom: $spacing-md;
-  margin-right: $spacing-md;
+  margin-bottom: vars.$spacing-md;
+  margin-right: vars.$spacing-md;
   transition: transform 0.2s ease;
 
   &:hover {
@@ -105,20 +105,5 @@ a[mat-list-item] {
 
   mat-icon {
     margin: 0;
-  }
-}
-
-// Material overrides
-mat-form-field {
-  .mat-mdc-form-field-focus-overlay {
-    background-color: $surface;
-  }
-
-  .mdc-text-field--outlined {
-    --mdc-outlined-text-field-container-shape: #{$border-radius-sm};
-  }
-
-  .mat-mdc-form-field-flex {
-    background-color: $surface;
   }
 }

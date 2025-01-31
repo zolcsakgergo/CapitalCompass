@@ -92,12 +92,12 @@ h1 {
   }
 }
 
-.feature-card {
+.feature-card.mat-mdc-card {
   text-align: center;
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
-  border-radius: $border-radius-lg !important;
+  border-radius: $border-radius-lg;
 
   &:hover {
     transform: translateY(-5px);
@@ -109,14 +109,14 @@ h1 {
     margin-bottom: $spacing-md;
   }
 
-  mat-card-title {
-    margin-bottom: $spacing-md !important;
-    font-size: $font-size-lg !important;
+  .mat-mdc-card-title {
+    margin-bottom: $spacing-md;
+    font-size: $font-size-lg;
     font-weight: $font-weight-medium;
     color: $text-primary;
   }
 
-  mat-card-content p {
+  .mat-mdc-card-content p {
     color: $text-secondary;
     margin: 0;
   }
