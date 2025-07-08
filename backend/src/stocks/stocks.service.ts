@@ -1,11 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Stock } from './entities/stock.entity';
+import { PrismaService } from '../prisma/prisma.service';
 import { TwelveDataService } from '../twelve-data/twelve-data.service';
 
 export interface CreateStockDto {
-  userId: number;
+  userId: string;
   stockName: string;
   symbol: string;
   shares: number;
@@ -18,12 +16,11 @@ export class StocksService {
   private readonly logger = new Logger(StocksService.name);
 
   constructor(
-    @InjectRepository(Stock)
-    private stocksRepository: Repository<Stock>,
+    private prisma: PrismaService,
     private twelveDataService: TwelveDataService,
   ) {}
 
-  private async updatePriceHistory(stock: Stock, currentPrice: number) {
+  private async updatePriceHistory(stock: any, currentPrice: number) {
     const now = new Date();
     const lastUpdate = stock.lastPriceUpdate;
 
@@ -79,38 +76,44 @@ export class StocksService {
         `Current market price fetched: ${currentPrice}, Purchase price provided: ${createStockDto.priceAtPurchase}`,
       );
 
-      const stock = this.stocksRepository.create({
-        ...createStockDto,
-        currentPrice,
-        previousDayPrice: currentPrice,
-        yearStartPrice: currentPrice,
-        lastPriceUpdate: new Date(),
+      const stock = await this.prisma.stock.create({
+        data: {
+          stockName: createStockDto.stockName,
+          symbol: createStockDto.symbol,
+          shares: createStockDto.shares,
+          priceAtPurchase: createStockDto.priceAtPurchase,
+          dateAcquired: new Date(createStockDto.dateAcquired),
+          userId: createStockDto.userId,
+          currentPrice,
+          previousDayPrice: currentPrice,
+          yearStartPrice: currentPrice,
+          lastPriceUpdate: new Date(),
+        },
       });
 
       this.logger.log('Saving stock position to database');
-      const savedStock = await this.stocksRepository.save(stock);
 
       // Calculate current value first (price * shares)
-      const currentValue = currentPrice * savedStock.shares;
+      const currentValue = currentPrice * Number(stock.shares);
       // Calculate initial investment value (purchase price * shares)
-      const initialValue = savedStock.priceAtPurchase * savedStock.shares;
+      const initialValue = Number(stock.priceAtPurchase) * Number(stock.shares);
       // Calculate total change based on the actual values
       const totalChange = ((currentValue - initialValue) / initialValue) * 100;
 
       this.logger.log(
         `Stock position saved successfully:
-        ID: ${savedStock.id}
-        Symbol: ${savedStock.symbol}
+        ID: ${stock.id}
+        Symbol: ${stock.symbol}
         Formatted Symbol: ${formattedSymbol}
-        Shares: ${savedStock.shares}
-        Price at Purchase: ${savedStock.priceAtPurchase}
+        Shares: ${stock.shares}
+        Price at Purchase: ${stock.priceAtPurchase}
         Current Price: ${currentPrice}
         Current Value: ${currentValue}
         Total Change: ${totalChange}%`,
       );
 
       return {
-        ...savedStock,
+        ...stock,
         currentValue,
         totalChange,
         dailyChange: 0,
@@ -122,8 +125,8 @@ export class StocksService {
     }
   }
 
-  async findAll(userId: number) {
-    const stocks = await this.stocksRepository.find({
+  async findAll(userId: string) {
+    const stocks = await this.prisma.stock.findMany({
       where: { userId },
     });
 
@@ -156,20 +159,36 @@ export class StocksService {
           );
         }
 
-        await this.updatePriceHistory(stock, currentPrice);
-        const savedStock = await this.stocksRepository.save(stock);
+        const updatedStock = await this.updatePriceHistory(
+          stock,
+          Number(currentPrice),
+        );
 
-        const currentValue = currentPrice * stock.shares;
-        const initialValue = stock.priceAtPurchase * stock.shares;
+        const savedStock = await this.prisma.stock.update({
+          where: { id: stock.id },
+          data: {
+            currentPrice: updatedStock.currentPrice,
+            previousDayPrice: updatedStock.previousDayPrice,
+            yearStartPrice: updatedStock.yearStartPrice,
+            lastPriceUpdate: updatedStock.lastPriceUpdate,
+          },
+        });
+
+        const currentValue = Number(currentPrice) * Number(stock.shares);
+        const initialValue =
+          Number(stock.priceAtPurchase) * Number(stock.shares);
 
         // Calculate changes based on the difference between current value and initial value
         const dailyChange = stock.previousDayPrice
-          ? ((currentPrice - stock.previousDayPrice) / stock.previousDayPrice) *
+          ? ((Number(currentPrice) - Number(stock.previousDayPrice)) /
+              Number(stock.previousDayPrice)) *
             100
           : 0;
 
         const ytdChange = stock.yearStartPrice
-          ? ((currentPrice - stock.yearStartPrice) / stock.yearStartPrice) * 100
+          ? ((Number(currentPrice) - Number(stock.yearStartPrice)) /
+              Number(stock.yearStartPrice)) *
+            100
           : 0;
 
         const totalChange =
@@ -200,18 +219,23 @@ export class StocksService {
       }),
     );
 
+    this.logger.log(`Found ${updatedStocks.length} stock positions`);
     return updatedStocks;
   }
 
-  async delete(userId: number, id: number) {
-    const stock = await this.stocksRepository.findOne({
+  async delete(userId: string, id: string) {
+    const stock = await this.prisma.stock.findFirst({
       where: { id, userId },
     });
 
     if (!stock) {
-      throw new Error('Stock position not found');
+      this.logger.warn(`Stock ${id} not found for user ${userId}`);
+      return;
     }
 
-    await this.stocksRepository.remove(stock);
+    await this.prisma.stock.delete({
+      where: { id },
+    });
+    this.logger.debug(`Deleted stock ${id} for user ${userId}`);
   }
 }

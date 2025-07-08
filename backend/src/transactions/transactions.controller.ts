@@ -57,19 +57,7 @@ export class TransactionsController {
   }
 
   @Delete(':id')
-  async deleteTransaction(@Request() req, @Param('id') id: string) {
-    try {
-      this.logger.log(`Deleting transaction ${id}`);
-      return await this.transactionsService.remove(
-        req.user.id,
-        parseInt(id, 10),
-      );
-    } catch (error) {
-      this.logger.error(`Error deleting transaction ${id}:`, error);
-      throw new HttpException(
-        error.message || 'Failed to delete transaction',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  async remove(@Param('id') id: string, @Request() req: any) {
+    return this.transactionsService.remove(req.user.id, id);
   }
 }

@@ -1,19 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Transaction } from './entities/transaction.entity';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TransactionsService {
-  constructor(
-    @InjectRepository(Transaction)
-    private transactionsRepository: Repository<Transaction>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  async create(
-    userId: number,
-    createTransactionDto: any,
-  ): Promise<Transaction> {
+  async create(userId: string, createTransactionDto: any) {
     const transaction = {
       ...createTransactionDto,
       userId,
@@ -21,18 +13,20 @@ export class TransactionsService {
         createTransactionDto.amount * createTransactionDto.pricePerUnit,
       transactionDate: new Date(createTransactionDto.transactionDate),
     };
-    return this.transactionsRepository.save(transaction);
-  }
-
-  async findAll(userId: number): Promise<Transaction[]> {
-    return this.transactionsRepository.find({
-      where: { userId },
-      order: { transactionDate: 'DESC' },
+    return this.prisma.transaction.create({
+      data: transaction,
     });
   }
 
-  async findOne(userId: number, id: number): Promise<Transaction> {
-    const transaction = await this.transactionsRepository.findOne({
+  async findAll(userId: string) {
+    return this.prisma.transaction.findMany({
+      where: { userId },
+      orderBy: { transactionDate: 'desc' },
+    });
+  }
+
+  async findOne(userId: string, id: string) {
+    const transaction = await this.prisma.transaction.findFirst({
       where: { id, userId },
     });
     if (!transaction) {
@@ -41,10 +35,17 @@ export class TransactionsService {
     return transaction;
   }
 
-  async remove(userId: number, id: number): Promise<void> {
-    const result = await this.transactionsRepository.delete({ id, userId });
-    if (result.affected === 0) {
+  async remove(userId: string, id: string): Promise<void> {
+    const transaction = await this.prisma.transaction.findFirst({
+      where: { id, userId },
+    });
+
+    if (!transaction) {
       throw new NotFoundException(`Transaction #${id} not found`);
     }
+
+    await this.prisma.transaction.delete({
+      where: { id },
+    });
   }
 }

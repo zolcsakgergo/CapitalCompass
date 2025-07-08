@@ -57,10 +57,10 @@ export class StocksController {
   }
 
   @Delete(':id')
-  async deleteStock(@Request() req, @Param('id') id: string) {
+  async deleteStockPosition(@Request() req, @Param('id') id: string) {
     try {
       this.logger.log(`Deleting stock position ${id}`);
-      return await this.stocksService.delete(req.user.id, parseInt(id, 10));
+      return await this.stocksService.delete(req.user.id, id);
     } catch (error) {
       this.logger.error(`Error deleting stock position ${id}:`, error);
       throw new HttpException(

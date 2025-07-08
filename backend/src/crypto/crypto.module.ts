@@ -1,16 +1,14 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { CryptoController } from './crypto.controller';
 import { CryptoService } from './crypto.service';
-import { Crypto } from './entities/crypto.entity';
-import { User } from '../users/user.entity';
 import { TwelveDataService } from '../twelve-data/twelve-data.service';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Crypto, User]), HttpModule, ConfigModule],
+  imports: [HttpModule, ConfigModule],
   controllers: [CryptoController],
-  providers: [CryptoService, TwelveDataService],
+  providers: [CryptoService, TwelveDataService, PrismaService],
 })
 export class CryptoModule {}

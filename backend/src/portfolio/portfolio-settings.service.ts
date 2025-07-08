@@ -1,10 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import {
-  PortfolioSettings,
-  PriceAlert,
-} from './entities/portfolio-settings.entity';
+import { PrismaService } from '../prisma/prisma.service';
 import {
   PortfolioSettingsDto,
   PriceAlertDto,
@@ -13,19 +8,13 @@ import {
 // This service manages portfolio settings and price alerts for users
 @Injectable()
 export class PortfolioSettingsService {
-  constructor(
-    // Inject TypeORM repositories to interact with the database
-    @InjectRepository(PortfolioSettings)
-    private settingsRepository: Repository<PortfolioSettings>,
-    @InjectRepository(PriceAlert)
-    private alertRepository: Repository<PriceAlert>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   // Get a user's portfolio settings including their price alerts
-  async getSettings(userId: number): Promise<PortfolioSettings> {
-    const settings = await this.settingsRepository.findOne({
+  async getSettings(userId: string) {
+    const settings = await this.prisma.portfolioSettings.findFirst({
       where: { userId },
-      relations: ['priceAlerts'], // Include related price alerts
+      include: { priceAlerts: true }, // Include related price alerts
     });
 
     if (!settings) {
@@ -36,63 +25,63 @@ export class PortfolioSettingsService {
   }
 
   // Update a user's portfolio settings and price alerts
-  async updateSettings(
-    userId: number,
-    settingsDto: PortfolioSettingsDto,
-  ): Promise<PortfolioSettings> {
+  async updateSettings(userId: string, settingsDto: PortfolioSettingsDto) {
     // Find existing settings or create new ones
-    let settings = await this.settingsRepository.findOne({
+    let settings = await this.prisma.portfolioSettings.findFirst({
       where: { userId },
     });
 
     if (!settings) {
-      settings = this.settingsRepository.create({ userId });
+      settings = await this.prisma.portfolioSettings.create({
+        data: { userId },
+      });
     }
 
     // Update basic settings from the DTO
-    settings.defaultCurrency = settingsDto.defaultCurrency;
-    settings.emailNotifications = settingsDto.notifications.email;
-    settings.pushNotifications = settingsDto.notifications.push;
-    settings.notificationFrequency = settingsDto.notifications.frequency;
-
-    // Save settings to get an ID if new
-    const savedSettings = await this.settingsRepository.save(settings);
+    const updatedSettings = await this.prisma.portfolioSettings.update({
+      where: { id: settings.id },
+      data: {
+        defaultCurrency: settingsDto.defaultCurrency,
+        emailNotifications: settingsDto.notifications.email,
+        pushNotifications: settingsDto.notifications.push,
+        notificationFrequency: settingsDto.notifications.frequency as any,
+      },
+    });
 
     // Delete existing alerts and create new ones from the DTO
-    await this.alertRepository.delete({ settingsId: savedSettings.id });
+    await this.prisma.priceAlert.deleteMany({
+      where: { settingsId: updatedSettings.id },
+    });
 
-    const alerts = settingsDto.priceAlerts.map(alert =>
-      this.alertRepository.create({
-        ...alert,
-        settingsId: savedSettings.id,
-      }),
-    );
-
-    await this.alertRepository.save(alerts);
+    if (settingsDto.priceAlerts.length > 0) {
+      await this.prisma.priceAlert.createMany({
+        data: settingsDto.priceAlerts.map(alert => ({
+          ...alert,
+          settingsId: updatedSettings.id,
+        })),
+      });
+    }
 
     // Return complete updated settings
     return this.getSettings(userId);
   }
 
   // Add a single new price alert for a user
-  async addPriceAlert(
-    userId: number,
-    alertDto: PriceAlertDto,
-  ): Promise<PriceAlert> {
+  async addPriceAlert(userId: string, alertDto: PriceAlertDto) {
     const settings = await this.getSettings(userId);
 
-    const alert = this.alertRepository.create({
-      ...alertDto,
-      settingsId: settings.id,
+    return this.prisma.priceAlert.create({
+      data: {
+        ...alertDto,
+        settingsId: settings.id,
+      },
     });
-
-    return this.alertRepository.save(alert);
   }
 
   // Remove a specific price alert for a user
-  async removePriceAlert(userId: number, alertId: number): Promise<void> {
+  async removePriceAlert(userId: string, alertId: string): Promise<void> {
     const settings = await this.getSettings(userId);
-    const alert = await this.alertRepository.findOne({
+    const alert = await this.prisma.priceAlert.findFirst({
       where: { id: alertId, settingsId: settings.id },
     });
 
@@ -100,6 +89,8 @@ export class PortfolioSettingsService {
       throw new NotFoundException('Price alert not found');
     }
 
-    await this.alertRepository.remove(alert);
+    await this.prisma.priceAlert.delete({
+      where: { id: alertId },
+    });
   }
 }

@@ -65,7 +65,7 @@ export class CryptoController {
   async deleteCryptoPosition(@Request() req, @Param('id') id: string) {
     try {
       this.logger.log(`Deleting crypto position ${id}`);
-      return await this.cryptoService.delete(req.user.id, parseInt(id, 10));
+      return await this.cryptoService.delete(req.user.id, id);
     } catch (error) {
       this.logger.error(`Error deleting crypto position ${id}:`, error);
       throw new HttpException(

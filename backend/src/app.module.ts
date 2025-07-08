@@ -1,5 +1,4 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_PIPE } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { CryptoModule } from './crypto/crypto.module';
@@ -7,41 +6,27 @@ import { AuthModule } from './auth/auth.module';
 import { StocksModule } from './stocks/stocks.module';
 import { TwelveDataModule } from './twelve-data/twelve-data.module';
 import { TransactionsModule } from './transactions/transactions.module';
-import { Crypto } from './crypto/entities/crypto.entity';
-import { User } from './users/user.entity';
-import { Stock } from './stocks/entities/stock.entity';
-import { Transaction } from './transactions/entities/transaction.entity';
-import {
-  PortfolioSettings,
-  PriceAlert,
-} from './portfolio/entities/portfolio-settings.entity';
-import { join } from 'path';
+import { PortfolioModule } from './portfolio/portfolio.module';
+import { UsersModule } from './users/users.module';
+import { TbszModule } from './tbsz/tbsz.module';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: join(__dirname, '..', 'db.sqlite'),
-      entities: [
-        User,
-        Crypto,
-        Stock,
-        Transaction,
-        PortfolioSettings,
-        PriceAlert,
-      ],
-      synchronize: true,
-    }),
     CryptoModule,
     AuthModule,
     StocksModule,
     TwelveDataModule,
     TransactionsModule,
+    PortfolioModule,
+    UsersModule,
+    TbszModule,
   ],
   providers: [
+    PrismaService,
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
@@ -50,5 +35,6 @@ import { join } from 'path';
       }),
     },
   ],
+  exports: [PrismaService],
 })
 export class AppModule {}

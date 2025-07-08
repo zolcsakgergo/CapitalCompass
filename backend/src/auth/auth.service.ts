@@ -1,9 +1,7 @@
 import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -11,8 +9,7 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private prisma: PrismaService,
     private jwtService: JwtService,
     private usersService: UsersService,
   ) {}
@@ -20,18 +17,18 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     this.logger.debug(`Attempting to validate user with email: ${email}`);
 
-    const user = await this.usersRepository.findOne({ where: { email } });
+    const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) {
       this.logger.debug('User not found');
       return null;
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     this.logger.debug(`Password validation result: ${isPasswordValid}`);
 
     if (isPasswordValid) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password: pwd, ...result } = user;
+      const { passwordHash: pwd, ...result } = user;
       return result;
     }
     return null;
@@ -68,7 +65,7 @@ export class AuthService {
   ) {
     this.logger.debug(`Registration attempt for email: ${email}`);
 
-    const existingUser = await this.usersRepository.findOne({
+    const existingUser = await this.prisma.user.findUnique({
       where: { email },
     });
 
@@ -78,22 +75,23 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = this.usersRepository.create({
-      email,
-      password: hashedPassword,
-      firstName,
-      lastName,
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        passwordHash: hashedPassword,
+        firstName,
+        lastName,
+      },
     });
 
-    const savedUser = await this.usersRepository.save(user);
     this.logger.debug('User registered successfully');
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: pwd, ...result } = savedUser;
+    const { passwordHash: pwd, ...result } = user;
     return result;
   }
 
-  async getProfile(userId: number) {
+  async getProfile(userId: string) {
     return this.usersService.getUserProfile(userId);
   }
 }

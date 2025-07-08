@@ -1,20 +1,14 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 import { TwelveDataModule } from '../twelve-data/twelve-data.module';
 import { StocksService } from './stocks.service';
 import { StocksController } from './stocks.controller';
-import { Stock } from './entities/stock.entity';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Stock]),
-    HttpModule,
-    ConfigModule,
-    TwelveDataModule,
-  ],
+  imports: [HttpModule, ConfigModule, TwelveDataModule],
   controllers: [StocksController],
-  providers: [StocksService],
+  providers: [StocksService, PrismaService],
 })
 export class StocksModule {}

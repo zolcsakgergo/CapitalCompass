@@ -1,8 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Crypto } from './entities/crypto.entity';
-import { User } from '../users/user.entity';
+import { PrismaService } from '../prisma/prisma.service';
 import { TwelveDataService } from '../twelve-data/twelve-data.service';
 
 @Injectable()
@@ -10,17 +7,14 @@ export class CryptoService {
   private readonly logger = new Logger(CryptoService.name);
 
   constructor(
-    @InjectRepository(Crypto)
-    private cryptoRepository: Repository<Crypto>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private prisma: PrismaService,
     private twelveDataService: TwelveDataService,
   ) {}
 
-  async findAll(userId: number): Promise<Crypto[]> {
-    const cryptos = await this.cryptoRepository.find({
+  async findAll(userId: string) {
+    const cryptos = await this.prisma.crypto.findMany({
       where: { userId },
-      order: { name: 'ASC' },
+      orderBy: { name: 'asc' },
     });
 
     if (cryptos.length === 0) {
@@ -45,20 +39,21 @@ export class CryptoService {
 
           // Calculate current value (current market price * amount)
           const currentValue = Number(
-            (currentPrice * crypto.amount).toFixed(2),
+            (currentPrice * Number(crypto.amount)).toFixed(2),
           );
 
           // Calculate total change with bounds checking and precision handling
           let totalChange = 0;
-          if (crypto.priceAtPurchase > 0) {
-            const initialValue = crypto.priceAtPurchase * crypto.amount;
+          if (Number(crypto.priceAtPurchase) > 0) {
+            const initialValue =
+              Number(crypto.priceAtPurchase) * Number(crypto.amount);
             if (initialValue > 0) {
               totalChange = Number(
                 (((currentValue - initialValue) / initialValue) * 100).toFixed(
                   2,
                 ),
               );
-              // Ensure the value is within SQLite's decimal bounds
+              // Ensure the value is within bounds
               totalChange = Math.max(
                 Math.min(totalChange, 999999.99),
                 -999999.99,
@@ -83,11 +78,21 @@ export class CryptoService {
 
       // Only save cryptos that got valid price updates
       const cryptosToUpdate = updatedCryptos.filter(
-        crypto => crypto.currentPrice && !isNaN(crypto.currentPrice),
+        crypto => crypto.currentPrice && !isNaN(Number(crypto.currentPrice)),
       );
 
       if (cryptosToUpdate.length > 0) {
-        await this.cryptoRepository.save(cryptosToUpdate);
+        // Update each crypto individually since Prisma doesn't support bulk updates like TypeORM
+        for (const crypto of cryptosToUpdate) {
+          await this.prisma.crypto.update({
+            where: { id: crypto.id },
+            data: {
+              currentPrice: crypto.currentPrice,
+              currentValue: crypto.currentValue,
+              totalChange: crypto.totalChange,
+            },
+          });
+        }
         this.logger.debug(
           `Updated prices for ${cryptosToUpdate.length} cryptos`,
         );
@@ -101,10 +106,10 @@ export class CryptoService {
     }
   }
 
-  async create(data: Partial<Crypto>): Promise<Crypto> {
+  async create(data: any) {
     this.logger.debug(`Creating crypto for user ID: ${data.userId}`);
 
-    const user = await this.userRepository.findOne({
+    const user = await this.prisma.user.findUnique({
       where: { id: data.userId },
     });
 
@@ -135,7 +140,7 @@ export class CryptoService {
             totalChange = Number(
               (((currentValue - initialValue) / initialValue) * 100).toFixed(2),
             );
-            // Ensure the value is within SQLite's decimal bounds
+            // Ensure the value is within bounds
             totalChange = Math.max(
               Math.min(totalChange, 999999.99),
               -999999.99,
@@ -143,46 +148,44 @@ export class CryptoService {
           }
         }
 
-        const crypto = this.cryptoRepository.create({
-          ...data,
-          user,
-          currentPrice: Number(currentPrice.toFixed(2)),
-          currentValue,
-          totalChange,
+        return this.prisma.crypto.create({
+          data: {
+            ...data,
+            currentPrice: Number(currentPrice.toFixed(2)),
+            currentValue,
+            totalChange,
+          },
         });
-
-        return this.cryptoRepository.save(crypto);
       } else {
         // If we can't get current price, create with purchase price as current price
         this.logger.warn(
           `Could not get current price for ${data.symbol}, using purchase price`,
         );
-        const crypto = this.cryptoRepository.create({
-          ...data,
-          user,
-          currentPrice: data.priceAtPurchase,
-          currentValue: data.priceAtPurchase * data.amount,
-          totalChange: 0,
+        return this.prisma.crypto.create({
+          data: {
+            ...data,
+            currentPrice: data.priceAtPurchase,
+            currentValue: data.priceAtPurchase * data.amount,
+            totalChange: 0,
+          },
         });
-
-        return this.cryptoRepository.save(crypto);
       }
     } catch (error) {
       this.logger.error(`Error creating crypto ${data.symbol}:`, error);
       // Create with purchase price if price fetch fails
-      const crypto = this.cryptoRepository.create({
-        ...data,
-        user,
-        currentPrice: data.priceAtPurchase,
-        currentValue: data.priceAtPurchase * data.amount,
-        totalChange: 0,
+      return this.prisma.crypto.create({
+        data: {
+          ...data,
+          currentPrice: data.priceAtPurchase,
+          currentValue: data.priceAtPurchase * data.amount,
+          totalChange: 0,
+        },
       });
-      return this.cryptoRepository.save(crypto);
     }
   }
 
-  async delete(userId: number, id: number): Promise<void> {
-    const crypto = await this.cryptoRepository.findOne({
+  async delete(userId: string, id: string): Promise<void> {
+    const crypto = await this.prisma.crypto.findFirst({
       where: { id, userId },
     });
 
@@ -191,7 +194,9 @@ export class CryptoService {
       return;
     }
 
-    await this.cryptoRepository.remove(crypto);
+    await this.prisma.crypto.delete({
+      where: { id },
+    });
     this.logger.debug(`Deleted crypto ${id} for user ${userId}`);
   }
 }
