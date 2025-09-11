@@ -1,0 +1,182 @@
+@use '../../../styles/variables' as vars;
+
+.tbsz-dashboard-container {
+  padding: 0 0 vars.$spacing-xl;
+}
+
+.dashboard-header {
+  margin-bottom: vars.$spacing-lg;
+  display: flex;
+  align-items: center;
+  padding: 0 vars.$spacing-lg;
+
+  h1 {
+    margin: 0;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: vars.$spacing-xl 0;
+
+  p {
+    margin-top: vars.$spacing-md;
+    color: vars.$text-secondary;
+  }
+}
+
+.no-accounts {
+  max-width: 600px;
+  margin: vars.$spacing-xl auto;
+  text-align: center;
+
+  .mat-mdc-card {
+    padding: vars.$spacing-lg;
+  }
+
+  p {
+    margin-bottom: vars.$spacing-lg;
+    font-size: 1.1em;
+    color: vars.$text-secondary;
+  }
+}
+
+.accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: vars.$spacing-lg;
+  padding: 0 vars.$spacing-lg;
+}
+
+.account-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: vars.$shadow-lg;
+  }
+
+  .mat-mdc-card-header {
+    position: relative;
+    padding: vars.$spacing-md;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 500;
+    text-transform: lowercase;
+  }
+
+  .status-active {
+    background-color: rgba(vars.$success, 0.1);
+    color: vars.$success;
+  }
+
+  .status-matured {
+    background-color: rgba(vars.$accent, 0.1);
+    color: vars.$accent;
+  }
+
+  .status-closed {
+    background-color: rgba(vars.$text-disabled, 0.15);
+    color: vars.$text-disabled;
+  }
+
+  .status-withdrawn {
+    background-color: rgba(vars.$warning, 0.1);
+    color: vars.$warning;
+  }
+
+  .card-actions {
+    position: absolute;
+    top: vars.$spacing-sm;
+    right: vars.$spacing-sm;
+  }
+
+  .mat-mdc-card-content {
+    padding: vars.$spacing-md;
+    flex: 1;
+  }
+}
+
+.account-details {
+  margin-bottom: vars.$spacing-lg;
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: vars.$spacing-sm;
+    line-height: 1.5;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .detail-label {
+    color: vars.$text-secondary;
+    font-weight: 500;
+  }
+
+  .detail-value {
+    font-weight: 500;
+  }
+}
+
+.maturity-progress {
+  margin-top: vars.$spacing-lg;
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: vars.$spacing-xs;
+  }
+
+  .progress-label {
+    color: vars.$text-secondary;
+    font-weight: 500;
+  }
+
+  .progress-value {
+    font-weight: 700;
+  }
+
+  .remaining-days {
+    margin-top: vars.$spacing-xs;
+    font-size: 0.9em;
+    color: vars.$text-secondary;
+    text-align: center;
+  }
+
+  .tax-free-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: vars.$spacing-sm;
+    color: vars.$accent;
+    font-weight: 500;
+
+    .mat-icon {
+      margin-right: vars.$spacing-xs;
+    }
+  }
+}
+
+@media (max-width: 599px) {
+  .accounts-grid {
+    grid-template-columns: 1fr;
+  }
+}

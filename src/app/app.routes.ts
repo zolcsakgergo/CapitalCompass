@@ -22,6 +22,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'tbsz',
+    loadChildren: () => import('./tbsz/tbsz.routes').then(m => m.TBSZ_ROUTES),
+    canActivate: [authGuard],
+  },
+  {
     path: 'profile',
     loadComponent: () =>
       import('./profile/profile.component').then(m => m.ProfileComponent),

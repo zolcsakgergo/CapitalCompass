@@ -1,0 +1,136 @@
+<div class="tbsz-dashboard-container">
+  <mat-toolbar color="primary" class="dashboard-header">
+    <h1>TBSZ Accounts</h1>
+    <span class="spacer"></span>
+    <button
+      mat-raised-button
+      color="accent"
+      (click)="openCreateAccountDialog(); $event.stopPropagation()"
+    >
+      <mat-icon>add</mat-icon>
+      New TBSZ Account
+    </button>
+  </mat-toolbar>
+
+  <div class="loading-container" *ngIf="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Loading accounts...</p>
+  </div>
+
+  <div class="no-accounts" *ngIf="!loading && accounts.length === 0">
+    <mat-card>
+      <mat-card-content>
+        <p>You don't have any TBSZ accounts yet.</p>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="openCreateAccountDialog(); $event.stopPropagation()"
+        >
+          Create Your First TBSZ Account
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="accounts-grid" *ngIf="!loading && accounts.length > 0">
+    <mat-card
+      *ngFor="let account of accounts"
+      class="account-card"
+      (click)="openAccountDetails(account.id)"
+    >
+      <mat-card-header>
+        <mat-card-title>{{ account.name }}</mat-card-title>
+        <mat-card-subtitle>
+          <span [class]="getAccountStatusClass(account)" class="status-badge">{{
+            account.status
+          }}</span>
+        </mat-card-subtitle>
+        <div class="card-actions">
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="menu"
+            (click)="$event.stopPropagation()"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button
+              mat-menu-item
+              (click)="openEditAccountDialog(account, $event)"
+            >
+              <mat-icon>edit</mat-icon>
+              <span>Edit</span>
+            </button>
+            <button mat-menu-item (click)="deleteAccount(account, $event)">
+              <mat-icon>delete</mat-icon>
+              <span>Delete</span>
+            </button>
+          </mat-menu>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="account-details">
+          <div class="detail-row">
+            <span class="detail-label">Opening Date:</span>
+            <span class="detail-value">{{
+              formatDate(account.openingDate)
+            }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Maturity Date:</span>
+            <span class="detail-value">{{
+              formatDate(account.maturityDate)
+            }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Initial Deposit:</span>
+            <span class="detail-value">{{
+              formatCurrency(account.initialDepositAmount)
+            }}</span>
+          </div>
+          <div
+            class="detail-row"
+            *ngIf="account.assets && account.assets.length > 0"
+          >
+            <span class="detail-label">Assets:</span>
+            <span class="detail-value">{{ account.assets.length }}</span>
+          </div>
+        </div>
+
+        <div class="maturity-progress">
+          <div class="progress-header">
+            <span class="progress-label">Tax-free maturity progress:</span>
+            <span class="progress-value"
+              >{{ calculateMaturityProgress(account) }}%</span
+            >
+          </div>
+          <mat-progress-bar
+            [color]="getProgressBarColor(account)"
+            mode="determinate"
+            [value]="calculateMaturityProgress(account)"
+          >
+          </mat-progress-bar>
+
+          <div class="remaining-days" *ngIf="getRemainingDays(account) > 0">
+            <span
+              >{{ getRemainingDays(account) }} days remaining until
+              tax-free</span
+            >
+          </div>
+          <div class="tax-free-notice" *ngIf="getRemainingDays(account) === 0">
+            <mat-icon color="accent">verified</mat-icon>
+            <span>Tax-free status achieved!</span>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button color="primary">
+          <mat-icon>visibility</mat-icon>
+          View Details
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

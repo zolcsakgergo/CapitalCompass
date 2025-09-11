@@ -65,7 +65,6 @@ export class TbszController {
     return { message: 'TBSZ account deleted successfully' };
   }
 
-  // Asset management endpoints
   @Post(':id/assets')
   async addAsset(
     @Param('id') accountId: string,

@@ -53,7 +53,6 @@ export class AddStockDialogComponent {
     }
 
     try {
-      // Format the date to ISO string
       const date = new Date(this.stock.purchaseDate);
       const isoDate = date.toISOString().split('T')[0];
 
@@ -63,7 +62,7 @@ export class AddStockDialogComponent {
         shares: Number(this.stock.shares),
         priceAtPurchase: Number(Number(this.stock.purchasePrice).toFixed(2)),
         dateAcquired: isoDate,
-        userId: 1, // TODO: Get from auth service
+        userId: 1,
         type: 'stock' as const,
       };
 

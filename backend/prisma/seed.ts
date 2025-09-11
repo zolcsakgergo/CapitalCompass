@@ -6,13 +6,11 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting seed...');
 
-  // Clean up existing data
   await prisma.asset.deleteMany({});
   await prisma.tbszAccount.deleteMany({});
   await prisma.portfolio.deleteMany({});
   await prisma.user.deleteMany({});
 
-  // Create users
   const passwordHash = await bcrypt.hash('Password123!', 10);
 
   const user1 = await prisma.user.create({
@@ -35,7 +33,6 @@ async function main() {
 
   console.log('Created users');
 
-  // Create TBSZ accounts for user1
   const tbsz1 = await prisma.tbszAccount.create({
     data: {
       name: 'TBSZ 2023',
@@ -56,7 +53,6 @@ async function main() {
     },
   });
 
-  // Create TBSZ account for user2
   const tbsz3 = await prisma.tbszAccount.create({
     data: {
       name: 'TBSZ 2023',
@@ -69,7 +65,6 @@ async function main() {
 
   console.log('Created TBSZ accounts');
 
-  // Create portfolios
   const portfolio1 = await prisma.portfolio.create({
     data: {
       name: 'Growth Portfolio',
@@ -88,7 +83,6 @@ async function main() {
 
   console.log('Created portfolios');
 
-  // Create assets in TBSZ accounts
   await prisma.asset.createMany({
     data: [
       {
@@ -134,7 +128,6 @@ async function main() {
     ],
   });
 
-  // Create assets in regular portfolios
   await prisma.asset.createMany({
     data: [
       {

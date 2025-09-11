@@ -39,7 +39,6 @@ interface PerformanceData {
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  // Portfolio metrics
   totalValue = 0;
   totalChangePercent = 0;
   totalPositions = 0;
@@ -47,7 +46,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   cryptoCount = 0;
   bestPerformer: PerformanceData | null = null;
 
-  // Chart configuration
   selectedChartType: ChartType = 'pie';
   chartData: ChartConfiguration['data'] = {
     labels: [],
@@ -93,12 +91,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private loadData() {
-    // Reset values
     this.totalValue = 0;
     this.totalChangePercent = 0;
     this.bestPerformer = null;
 
-    // Load stocks
     this.stockService
       .getPositions()
       .pipe(takeUntil(this.destroy$))
@@ -126,7 +122,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
           );
         });
 
-        // Load crypto after stocks
         this.cryptoService
           .getPositions()
           .pipe(takeUntil(this.destroy$))
@@ -154,7 +149,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
               );
             });
 
-            // Update total portfolio metrics
             this.totalValue = totalStockValue + totalCryptoValue;
             const totalInitialValue =
               totalStockInitialValue + totalCryptoInitialValue;
@@ -246,9 +240,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleTradeCancelled() {
-    // Handle trade cancellation if needed
-  }
+  handleTradeCancelled() {}
 
   logout() {
     this.authService.logout();

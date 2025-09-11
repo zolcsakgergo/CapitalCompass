@@ -56,7 +56,6 @@ export class AddCryptoDialogComponent {
     }
 
     try {
-      // Format the date to ISO string
       const date = new Date(this.crypto.dateAcquired);
       const isoDate = date.toISOString().split('T')[0];
 

@@ -1,15 +1,19 @@
 {
   "name": "investment-tracker",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Investment tracking application with Prisma ORM",
+  "main": "index.js",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "format": "prettier --write \"src/**/*.{ts,html,css,scss}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,html,css,scss}\"",
-    "analyze-bundle": "source-map-explorer dist/stats.json"
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "build": "ng build --configuration production",
+    "build:frontend": "ng build --configuration production",
+    "build:backend": "tsc",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio",
+    "seed": "ts-node prisma/seed.ts"
   },
   "private": true,
   "dependencies": {
@@ -34,7 +38,9 @@
     "sass": "^1.83.4",
     "tslib": "^2.3.0",
     "typeorm": "^0.3.20",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "@prisma/client": "^5.10.0",
+    "bcrypt": "^5.1.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.0.2",
@@ -48,6 +54,13 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "prettier": "^3.4.2",
-    "typescript": "~5.6.2"
+    "typescript": "^5.3.3",
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20.11.0",
+    "prisma": "^5.10.0",
+    "ts-node": "^10.9.2"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }

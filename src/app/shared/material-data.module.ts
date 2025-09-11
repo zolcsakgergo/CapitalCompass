@@ -5,7 +5,6 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 
-// Data presentation Material modules
 const materialModules = [
   MatTableModule,
   MatPaginatorModule,

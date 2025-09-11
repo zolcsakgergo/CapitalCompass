@@ -133,16 +133,44 @@ h3 {
 .mat-mdc-dialog-container.mdc-dialog__container {
   .mdc-dialog__surface {
     padding: vars.$spacing-xl;
+    border-radius: vars.$border-radius-lg;
+    box-shadow: vars.$shadow-lg;
   }
 
   .mat-mdc-dialog-content.mat-mdc-dialog-content {
     padding: vars.$spacing-md;
+    max-height: 70vh;
+    overflow-y: auto;
   }
 
   .mat-mdc-dialog-actions.mat-mdc-dialog-actions {
     padding: vars.$spacing-md;
     gap: vars.$spacing-xs;
   }
+}
+
+// Ensure dialog overlay is visible
+.cdk-overlay-pane {
+  z-index: 1000 !important;
+}
+
+.cdk-overlay-backdrop {
+  z-index: 999 !important;
+}
+
+// Additional dialog visibility fixes
+.mat-mdc-dialog-container {
+  z-index: 1001 !important;
+}
+
+.cdk-global-overlay-wrapper {
+  z-index: 1000 !important;
+}
+
+// Ensure dialog content is visible
+.mat-mdc-dialog-content {
+  max-height: 70vh !important;
+  overflow-y: auto !important;
 }
 
 // Sidenav

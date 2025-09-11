@@ -1,0 +1,17 @@
+@use '../../../styles/variables' as vars;
+
+.full-width {
+  width: 100%;
+  margin-bottom: vars.$spacing-md;
+}
+
+mat-dialog-content {
+  min-width: 300px;
+  max-width: 100%;
+  padding-top: vars.$spacing-md;
+}
+
+h2 {
+  margin: 0;
+  font-weight: 500;
+}

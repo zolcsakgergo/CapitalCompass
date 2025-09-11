@@ -20,8 +20,8 @@ export class TwelveDataService {
   private requestCount = 0;
   private lastRequestTime = Date.now();
   private readonly requestLimit = 8;
-  private readonly timeWindow = 60000; // 1 minute in milliseconds
-  private readonly retryDelay = 2000; // 2 seconds
+  private readonly timeWindow = 60000;
+  private readonly retryDelay = 2000;
 
   constructor(
     private readonly httpService: HttpService,
@@ -72,7 +72,7 @@ export class TwelveDataService {
         } catch (error) {
           this.logger.error('Error processing queued request:', error);
         }
-        await this.delay(this.retryDelay); // Add delay between requests
+        await this.delay(this.retryDelay);
       }
     }
 
@@ -191,7 +191,6 @@ export class TwelveDataService {
         prices.set(symbol, price);
       } catch (error) {
         this.logger.error(`Failed to fetch price for ${symbol}:`, error);
-        // Don't set a price if we failed to fetch it
       }
     }
 

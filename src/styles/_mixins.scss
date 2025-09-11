@@ -1,6 +1,5 @@
 @use 'variables' as *;
 
-// Responsive Breakpoints
 @mixin respond-to($breakpoint) {
   @if $breakpoint == sm {
     @media (max-width: $breakpoint-sm) {
@@ -24,7 +23,6 @@
   }
 }
 
-// Card Styles
 @mixin card {
   background: $background;
   border-radius: $border-radius-md;
@@ -32,7 +30,6 @@
   padding: $spacing-lg;
 }
 
-// Status Indicators
 @mixin status-indicator($type: 'default') {
   font-weight: $font-weight-medium;
 
@@ -47,7 +44,6 @@
   }
 }
 
-// Table Styles
 @mixin table-styles {
   .mat-mdc-header-cell {
     font-weight: $font-weight-medium;
@@ -66,7 +62,6 @@
   }
 }
 
-// Form Field Styles
 @mixin form-field {
   .mat-mdc-form-field {
     width: 100%;
@@ -74,7 +69,6 @@
   }
 }
 
-// Flex Layout Patterns
 @mixin flex-center {
   display: flex;
   align-items: center;
@@ -97,14 +91,12 @@
   justify-content: flex-end;
 }
 
-// Grid Layout
 @mixin grid-responsive($min-width: 200px) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
   gap: $spacing-md;
 }
 
-// Button Styles
 @mixin button-base {
   padding: $spacing-sm $spacing-md;
   border-radius: $border-radius-sm;
@@ -112,7 +104,6 @@
   transition: all 0.2s ease;
 }
 
-// Material Theme Overrides
 @mixin material-theme-overrides {
   :host ::ng-deep {
     .mat-mdc-card {

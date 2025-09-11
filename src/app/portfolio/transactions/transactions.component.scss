@@ -21,14 +21,12 @@
   font-weight: vars.$font-weight-medium;
 }
 
-// No data state
 .no-data {
   text-align: center;
   padding: vars.$spacing-xl;
   color: vars.$text-secondary;
 }
 
-// Filter section
 .filter-section {
   @include mix.flex-column;
   gap: vars.$spacing-md;

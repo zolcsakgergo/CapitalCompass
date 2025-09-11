@@ -51,7 +51,6 @@ export class MarketDataService {
       .pipe(map(response => parseFloat(response.price)));
   }
 
-  // Get multiple stock prices in one request to save on rate limit
   getBatchQuotes(symbols: string[]): Observable<Map<string, number>> {
     if (!this.canMakeRequest()) {
       throw new Error('Rate limit exceeded. Please try again later.');
@@ -68,10 +67,8 @@ export class MarketDataService {
         map(response => {
           const priceMap = new Map<string, number>();
           if (symbols.length === 1) {
-            // Single symbol response
             priceMap.set(symbols[0], parseFloat(response.price));
           } else {
-            // Multiple symbols response
             Object.entries(response).forEach(
               ([symbol, data]: [string, any]) => {
                 priceMap.set(symbol, parseFloat(data.price));

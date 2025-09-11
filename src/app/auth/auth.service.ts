@@ -36,7 +36,6 @@ export class AuthService {
     private http: HttpClient,
     private router: Router,
   ) {
-    // Load token from localStorage on service initialization
     const token = localStorage.getItem('token');
     const userId = localStorage.getItem('userId');
     if (token && userId) {
@@ -159,11 +158,9 @@ export class AuthService {
     let errorMessage = 'An unknown error occurred!';
 
     if (error.error instanceof ErrorEvent) {
-      // Client-side error
       console.error('Client Error:', error.error.message);
       errorMessage = error.error.message;
     } else {
-      // Server-side error
       console.error('Server Error:', error.status, error.error);
       if (error.status === 401) {
         this.clearAuth();

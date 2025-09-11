@@ -1,7 +1,11 @@
 <div class="login-dialog">
   <div class="dialog-header">
     <h2>Login</h2>
-    <button mat-icon-button (click)="dialogRef?.close()" class="close-button">
+    <button
+      mat-icon-button
+      (click)="dialogRef && dialogRef.close()"
+      class="close-button"
+    >
       <mat-icon>close</mat-icon>
     </button>
   </div>

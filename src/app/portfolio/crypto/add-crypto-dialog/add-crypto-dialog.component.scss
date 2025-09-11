@@ -21,7 +21,6 @@ form {
   @include flex-column;
 }
 
-// Material form field overrides
 mat-form-field {
   .mat-mdc-form-field-focus-overlay {
     background-color: $surface;
@@ -36,7 +35,6 @@ mat-form-field {
   }
 }
 
-// Dialog button styles
 button[mat-flat-button] {
   padding: $spacing-sm $spacing-md;
   font-size: $font-size-base;

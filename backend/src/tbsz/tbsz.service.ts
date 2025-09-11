@@ -143,7 +143,7 @@ export class TbszService {
       Math.max((elapsedDays / totalDays) * 100, 0),
       100,
     );
-    return Math.round(progress * 100) / 100; // Round to 2 decimal places
+    return Math.round(progress * 100) / 100;
   }
 
   calculateRemainingDays(account: any): number {
@@ -155,13 +155,11 @@ export class TbszService {
     return Math.max(Math.ceil(remainingDays), 0);
   }
 
-  // Asset management methods
   async addAsset(userId: string, accountId: string, data: CreateAssetDto) {
     this.logger.log(
       `Adding asset to TBSZ account: ${accountId} for user: ${userId}`,
     );
 
-    // Verify the account belongs to the user
     const account = await this.prisma.tbszAccount.findFirst({
       where: { id: accountId, userId },
     });
@@ -174,7 +172,7 @@ export class TbszService {
       data: {
         name: data.name,
         symbol: data.symbol || '',
-        type: data.type as any, // Cast to AssetType enum
+        type: data.type as any,
         purchaseDate: new Date(data.purchaseDate),
         purchasePrice: data.purchasePrice,
         quantity: data.quantity,
@@ -189,7 +187,6 @@ export class TbszService {
       `Fetching assets for TBSZ account: ${accountId} for user: ${userId}`,
     );
 
-    // Verify the account belongs to the user
     const account = await this.prisma.tbszAccount.findFirst({
       where: { id: accountId, userId },
     });
@@ -209,7 +206,6 @@ export class TbszService {
       `Fetching asset: ${assetId} from TBSZ account: ${accountId} for user: ${userId}`,
     );
 
-    // Verify the account belongs to the user
     const account = await this.prisma.tbszAccount.findFirst({
       where: { id: accountId, userId },
     });
@@ -239,7 +235,6 @@ export class TbszService {
       `Updating asset: ${assetId} in TBSZ account: ${accountId} for user: ${userId}`,
     );
 
-    // Verify the account belongs to the user
     const account = await this.prisma.tbszAccount.findFirst({
       where: { id: accountId, userId },
     });
@@ -248,7 +243,6 @@ export class TbszService {
       throw new NotFoundException(`TBSZ account not found`);
     }
 
-    // Verify the asset exists and belongs to the account
     const asset = await this.prisma.asset.findFirst({
       where: { id: assetId, tbszAccountId: accountId },
     });
@@ -260,7 +254,7 @@ export class TbszService {
     const updateData: any = {};
     if (data.name !== undefined) updateData.name = data.name;
     if (data.symbol !== undefined) updateData.symbol = data.symbol;
-    if (data.type !== undefined) updateData.type = data.type as any; // Cast to AssetType enum
+    if (data.type !== undefined) updateData.type = data.type as any;
     if (data.purchaseDate !== undefined)
       updateData.purchaseDate = new Date(data.purchaseDate);
     if (data.purchasePrice !== undefined)
@@ -280,7 +274,6 @@ export class TbszService {
       `Deleting asset: ${assetId} from TBSZ account: ${accountId} for user: ${userId}`,
     );
 
-    // Verify the account belongs to the user
     const account = await this.prisma.tbszAccount.findFirst({
       where: { id: accountId, userId },
     });
@@ -289,7 +282,6 @@ export class TbszService {
       throw new NotFoundException(`TBSZ account not found`);
     }
 
-    // Verify the asset exists and belongs to the account
     const asset = await this.prisma.asset.findFirst({
       where: { id: assetId, tbszAccountId: accountId },
     });

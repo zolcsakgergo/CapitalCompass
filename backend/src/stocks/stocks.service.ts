@@ -34,7 +34,6 @@ export class StocksService {
       Last Update: ${lastUpdate}`,
     );
 
-    // If this is the first update or if the last update was on a different day
     if (!lastUpdate || lastUpdate.getDate() !== now.getDate()) {
       stock.previousDayPrice = stock.currentPrice || currentPrice;
       this.logger.debug(
@@ -42,7 +41,6 @@ export class StocksService {
       );
     }
 
-    // If this is the first update of the year or if we don't have a year start price
     if (
       !stock.yearStartPrice ||
       lastUpdate?.getFullYear() !== now.getFullYear()
@@ -69,7 +67,6 @@ export class StocksService {
         `Creating stock position for symbol: ${formattedSymbol} (original: ${createStockDto.symbol})`,
       );
 
-      // Get current market price
       const currentPrice =
         await this.twelveDataService.getPrice(formattedSymbol);
       this.logger.log(
@@ -93,11 +90,8 @@ export class StocksService {
 
       this.logger.log('Saving stock position to database');
 
-      // Calculate current value first (price * shares)
       const currentValue = currentPrice * Number(stock.shares);
-      // Calculate initial investment value (purchase price * shares)
       const initialValue = Number(stock.priceAtPurchase) * Number(stock.shares);
-      // Calculate total change based on the actual values
       const totalChange = ((currentValue - initialValue) / initialValue) * 100;
 
       this.logger.log(
@@ -138,7 +132,6 @@ export class StocksService {
       `Found ${stocks.length} stock positions for user ${userId}`,
     );
 
-    // Format symbols before fetching prices
     const symbols = [...new Set(stocks.map(p => this.formatSymbol(p.symbol)))];
     this.logger.debug(`Fetching prices for symbols: ${symbols.join(', ')}`);
     const prices = await this.twelveDataService.getPrices(symbols);
@@ -178,7 +171,6 @@ export class StocksService {
         const initialValue =
           Number(stock.priceAtPurchase) * Number(stock.shares);
 
-        // Calculate changes based on the difference between current value and initial value
         const dailyChange = stock.previousDayPrice
           ? ((Number(currentPrice) - Number(stock.previousDayPrice)) /
               Number(stock.previousDayPrice)) *
