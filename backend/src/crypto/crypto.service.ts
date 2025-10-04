@@ -21,7 +21,6 @@ export class CryptoService {
       return [];
     }
 
-    // Format symbols for Twelve Data API (e.g., BTC/USD)
     const symbols = cryptos.map(crypto => `${crypto.symbol}/USD`);
     this.logger.debug(`Fetching prices for symbols: ${symbols.join(', ')}`);
 
@@ -36,7 +35,6 @@ export class CryptoService {
             `Updating ${crypto.symbol} with new price: ${currentPrice}`,
           );
 
-          // Calculate current value (current market price * amount)
           const currentValue = Number(
             (currentPrice * Number(crypto.amount)).toFixed(2),
           );

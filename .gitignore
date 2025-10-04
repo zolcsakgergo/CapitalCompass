@@ -6,6 +6,9 @@
 /out-tsc
 /bazel-out
 
+# Angular CLI cache
+.angular/
+
 # Node
 node_modules/
 npm-debug.log
@@ -29,7 +32,15 @@ yarn-error.log
 # Angular specific
 .angular/
 .angular/cache/
-*.spec.ts
+*.tgz
+*.tar.gz
+
+# Angular build artifacts
+/bazel-out
+
+# Angular dependencies
+# Uncomment if you have issues with frontend dependencies
+# /node_modules/@angular/
 
 # Testing
 /coverage

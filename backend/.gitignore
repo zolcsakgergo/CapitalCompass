@@ -58,6 +58,5 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Database
 db.sqlite
 
-# Environment files
-/src/environments/*
-!/src/environments/environment.ts
+# Environment files - backend should not have src/environments
+# Frontend environment files are handled by root .gitignore
