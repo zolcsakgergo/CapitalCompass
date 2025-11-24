@@ -37,14 +37,11 @@ export class TbszService {
   constructor(private http: HttpClient) {
     this.loadAccounts();
   }
-
   loadAccounts(): void {
-    console.log('Loading TBSZ accounts from:', `${this.API_URL}/tbsz`);
     this.http
       .get<TbszAccount[]>(`${this.API_URL}/tbsz`)
       .pipe(
         map(accounts => {
-          console.log('Raw accounts from API:', accounts);
           return accounts.map(account => ({
             ...account,
             openingDate: new Date(account.openingDate),
@@ -66,7 +63,6 @@ export class TbszService {
       )
       .subscribe({
         next: accounts => {
-          console.log('Processed accounts:', accounts);
           this.tbszAccountsSubject.next(accounts);
         },
         error: error => {

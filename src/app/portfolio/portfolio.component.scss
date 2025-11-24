@@ -4,7 +4,7 @@
 
 .portfolio-wrapper {
   min-height: 100vh;
-  min-width: 100vw;
+  width: 100vw;
   position: fixed;
   top: 0;
   left: 0;
@@ -22,6 +22,7 @@
   width: 100%;
   height: 100%;
   background: transparent;
+  overflow-x: hidden;
 }
 
 .sidenav {
@@ -53,17 +54,22 @@ mat-sidenav-content {
 
 .content {
   flex: 1;
-  padding: vars.$spacing-md;
-  overflow-y: auto;
+  padding: 0;
+  overflow: hidden;
   position: relative;
   background: rgba(vars.$background, 0.95);
   margin: vars.$spacing-md;
   border-radius: vars.$border-radius-lg;
   box-shadow: vars.$shadow-md;
+  max-width: calc(100vw - #{vars.$spacing-md * 2});
+  box-sizing: border-box;
+  height: calc(100vh - 120px);
 
   @include mix.respond-to(md) {
     margin: vars.$spacing-sm;
-    padding: vars.$spacing-md;
+    padding: 0;
+    max-width: calc(100vw - #{vars.$spacing-sm * 2});
+    height: calc(100vh - 100px);
   }
 }
 

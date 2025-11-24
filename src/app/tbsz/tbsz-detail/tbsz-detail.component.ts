@@ -56,172 +56,159 @@ export class TbszDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.loadAccountDetails(id);
-      }
-    });
-  }
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.router.navigate(['/tbsz']);
+      return;
+    }
 
-  loadAccountDetails(id: string): void {
-    this.loading = true;
     this.tbszService.getAccount(id).subscribe({
-      next: account => {
+      next: (account: TbszAccount) => {
         this.account = account;
         this.loading = false;
       },
-      error: error => {
-        console.error('Error loading TBSZ account details', error);
-        this.snackBar.open('Error loading account details', 'Close', {
+      error: () => {
+        this.loading = false;
+        this.snackBar.open('Failed to load TBSZ account', 'Close', {
           duration: 3000,
         });
-        this.loading = false;
-        this.navigateBack();
+        this.router.navigate(['/tbsz']);
       },
     });
   }
 
-  navigateBack(): void {
+  goBack(): void {
     this.router.navigate(['/tbsz']);
   }
 
   openAddAssetDialog(): void {
-    console.log('Opening add asset dialog...');
     if (!this.account) {
-      console.log('No account available');
       return;
     }
 
-    try {
-      const dialogRef = this.dialog.open(AssetFormComponent, {
-        width: '500px',
-        data: {
-          isEdit: false,
-          tbszAccountId: this.account.id,
-        },
-      });
-
-      console.log('Asset dialog reference created:', dialogRef);
-
-      dialogRef.afterOpened().subscribe(() => {
-        console.log('Asset dialog opened successfully');
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        console.log('Asset dialog closed with result:', result);
-        if (result && this.account) {
-          this.loadAccountDetails(this.account.id);
-        }
-      });
-    } catch (error) {
-      console.error('Error opening asset dialog:', error);
-    }
-  }
-
-  openEditAssetDialog(asset: Asset): void {
-    if (!this.account) return;
-
     const dialogRef = this.dialog.open(AssetFormComponent, {
-      width: '500px',
-      data: {
-        isEdit: true,
-        asset: asset,
-        tbszAccountId: this.account.id,
-      },
+      width: '480px',
+      data: { accountId: this.account.id },
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result && this.account) {
-        this.loadAccountDetails(this.account.id);
+      if (result) {
+        this.reloadAccount();
+      }
+    });
+  }
+
+  openEditAssetDialog(asset: Asset): void {
+    if (!this.account) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open(AssetFormComponent, {
+      width: '480px',
+      data: { accountId: this.account.id, asset },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.reloadAccount();
       }
     });
   }
 
   deleteAsset(asset: Asset): void {
-    if (!this.account) return;
-
-    if (confirm(`Are you sure you want to delete ${asset.name}?`)) {
-      this.tbszService.deleteAsset(this.account.id, asset.id).subscribe({
-        next: () => {
-          this.snackBar.open('Asset deleted successfully', 'Close', {
-            duration: 3000,
-          });
-          if (this.account) {
-            this.loadAccountDetails(this.account.id);
-          }
-        },
-        error: error => {
-          console.error('Error deleting asset', error);
-          this.snackBar.open('Error deleting asset', 'Close', {
-            duration: 3000,
-          });
-        },
-      });
+    if (!this.account) {
+      return;
     }
+
+    const confirmed = confirm(
+      `Are you sure you want to delete asset "${asset.name}"?`,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    this.tbszService.deleteAsset(this.account.id, asset.id).subscribe({
+      next: () => {
+        this.snackBar.open('Asset deleted', 'Close', { duration: 2500 });
+        this.reloadAccount();
+      },
+      error: () => {
+        this.snackBar.open('Failed to delete asset', 'Close', {
+          duration: 3000,
+        });
+      },
+    });
+  }
+
+  private reloadAccount(): void {
+    if (!this.account) {
+      return;
+    }
+
+    this.tbszService
+      .getAccount(this.account.id)
+      .subscribe((account: TbszAccount) => {
+        this.account = account;
+      });
   }
 
   calculateMaturityProgress(): number {
-    if (!this.account) return 0;
+    if (!this.account) {
+      return 0;
+    }
     return this.tbszService.calculateMaturityProgress(this.account);
   }
 
   getRemainingDays(): number {
-    if (!this.account) return 0;
+    if (!this.account) {
+      return 0;
+    }
     return this.tbszService.calculateRemainingDays(this.account);
   }
 
   getProgressBarColor(): string {
-    if (!this.account) return 'warn';
     const progress = this.calculateMaturityProgress();
     if (progress >= 100) {
-      return 'accent'; // Matured
-    } else if (progress >= 75) {
-      return 'primary'; // Almost there
-    } else {
-      return 'warn'; // Still a long way to go
+      return 'primary';
     }
+    if (progress >= 75) {
+      return 'accent';
+    }
+    return 'warn';
   }
 
   getStatusClass(): string {
-    if (!this.account) return '';
-    switch (this.account.status) {
-      case 'ACTIVE':
-        return 'status-active';
-      case 'MATURED':
-        return 'status-matured';
-      case 'CLOSED':
-        return 'status-closed';
-      case 'WITHDRAWN':
-        return 'status-withdrawn';
-      default:
-        return '';
+    const status = this.account?.status?.toUpperCase();
+    if (status === 'ACTIVE') {
+      return 'status-badge status-active';
     }
+    if (status === 'MATURED') {
+      return 'status-badge status-matured';
+    }
+    if (status === 'CLOSED') {
+      return 'status-badge status-closed';
+    }
+    if (status === 'WITHDRAWN') {
+      return 'status-badge status-withdrawn';
+    }
+    return 'status-badge';
   }
 
   getTotalValue(): number {
-    if (!this.account || !this.account.assets) return 0;
-    return this.account.assets.reduce(
-      (sum, asset) => sum + asset.currentValue,
-      0,
-    );
-  }
-
-  exportToCsv(): void {
-    if (!this.account) return;
-    this.tbszService.exportToCsv(this.account);
-  }
-
-  exportToJson(): void {
-    if (!this.account) return;
-    this.tbszService.exportToJson(this.account);
+    if (!this.account || !this.account.assets) {
+      return 0;
+    }
+    return this.account.assets.reduce((sum, asset) => {
+      const currentValue = asset.currentValue ?? 0;
+      return sum + currentValue;
+    }, 0);
   }
 
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('hu-HU', {
       style: 'currency',
       currency: 'HUF',
-    }).format(amount);
+    }).format(amount ?? 0);
   }
 
   formatDate(date: Date): string {

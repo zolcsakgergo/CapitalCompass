@@ -33,28 +33,30 @@ export class PortfolioSettingsService {
       });
     }
 
-    const updatedSettings = await this.prisma.portfolioSettings.update({
-      where: { id: settings.id },
-      data: {
-        defaultCurrency: settingsDto.defaultCurrency,
-        emailNotifications: settingsDto.notifications.email,
-        pushNotifications: settingsDto.notifications.push,
-        notificationFrequency: settingsDto.notifications.frequency as any,
-      },
-    });
-
-    await this.prisma.priceAlert.deleteMany({
-      where: { settingsId: updatedSettings.id },
-    });
-
-    if (settingsDto.priceAlerts.length > 0) {
-      await this.prisma.priceAlert.createMany({
-        data: settingsDto.priceAlerts.map(alert => ({
-          ...alert,
-          settingsId: updatedSettings.id,
-        })),
+    await this.prisma.$transaction(async tx => {
+      await tx.portfolioSettings.update({
+        where: { id: settings.id },
+        data: {
+          defaultCurrency: settingsDto.defaultCurrency,
+          emailNotifications: settingsDto.notifications.email,
+          pushNotifications: settingsDto.notifications.push,
+          notificationFrequency: settingsDto.notifications.frequency as any,
+        },
       });
-    }
+
+      await tx.priceAlert.deleteMany({
+        where: { settingsId: settings.id },
+      });
+
+      if (settingsDto.priceAlerts.length > 0) {
+        await tx.priceAlert.createMany({
+          data: settingsDto.priceAlerts.map(alert => ({
+            ...alert,
+            settingsId: settings.id,
+          })),
+        });
+      }
+    });
 
     return this.getSettings(userId);
   }

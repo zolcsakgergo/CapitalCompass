@@ -15,14 +15,7 @@ export class StockService {
   ) {}
 
   getPositions(): Observable<StockPosition[]> {
-    console.log('[API] Requesting stocks from:', API_ROUTES.STOCKS);
-    return this.http
-      .get<StockPosition[]>(API_ROUTES.STOCKS)
-      .pipe(
-        tap(response =>
-          console.log('[API] Received stocks response:', response),
-        ),
-      );
+    return this.http.get<StockPosition[]>(API_ROUTES.STOCKS);
   }
 
   addPosition(

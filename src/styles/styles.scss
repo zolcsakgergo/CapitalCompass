@@ -8,6 +8,18 @@ body {
   height: 100%;
   margin: 0;
   font-family: vars.$font-family;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  position: relative;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-y: auto;
 }
 
 // Core layout classes

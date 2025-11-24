@@ -41,9 +41,9 @@
       <mat-card-header>
         <mat-card-title>{{ account.name }}</mat-card-title>
         <mat-card-subtitle>
-          <span [class]="getAccountStatusClass(account)" class="status-badge">{{
-            account.status
-          }}</span>
+          <span [class]="getAccountStatusClass(account)">
+            {{ account.status | titlecase }}
+          </span>
         </mat-card-subtitle>
         <div class="card-actions">
           <button
@@ -72,64 +72,94 @@
       <mat-card-content>
         <div class="account-details">
           <div class="detail-row">
-            <span class="detail-label">Opening Date:</span>
+            <span class="detail-label">Opening date</span>
             <span class="detail-value">{{
               formatDate(account.openingDate)
             }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">Maturity Date:</span>
+            <span class="detail-label">Maturity date</span>
             <span class="detail-value">{{
               formatDate(account.maturityDate)
             }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">Initial Deposit:</span>
-            <span class="detail-value">{{
-              formatCurrency(account.initialDepositAmount)
-            }}</span>
+            <span class="detail-label">Initial deposit</span>
+            <span class="detail-value">
+              {{ formatCurrency(account.initialDepositAmount) }}
+            </span>
           </div>
           <div
             class="detail-row"
             *ngIf="account.assets && account.assets.length > 0"
           >
-            <span class="detail-label">Assets:</span>
+            <span class="detail-label">Assets</span>
             <span class="detail-value">{{ account.assets.length }}</span>
           </div>
         </div>
 
-        <div class="maturity-progress">
+        <!-- Early withdrawal warning (inline) -->
+        <div
+          class="early-withdrawal-warning"
+          *ngIf="
+            account.status === 'WITHDRAWN' && getRemainingDays(account) > 0
+          "
+        >
+          <div class="warning-header">
+            <mat-icon>warning</mat-icon>
+            <span>Early withdrawal</span>
+          </div>
+
+          <div class="warning-content">
+            <p class="warning-item">
+              This account was withdrawn before reaching the 5-year tax-free
+              maturity period.
+            </p>
+            <p class="warning-item">
+              Any gains realized on this account may be subject to capital gains
+              tax.
+            </p>
+            <p class="warning-item">
+              Remaining time to tax-free status:
+              <strong>{{ getRemainingDays(account) }} days</strong>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Maturity progress / tax-free notice -->
+        <div
+          class="maturity-progress"
+          *ngIf="
+            account.status !== 'WITHDRAWN' || getRemainingDays(account) === 0
+          "
+        >
           <div class="progress-header">
-            <span class="progress-label">Tax-free maturity progress:</span>
-            <span class="progress-value"
-              >{{ calculateMaturityProgress(account) }}%</span
-            >
+            <span class="progress-label">Maturity progress</span>
+            <span class="progress-value">
+              {{ calculateMaturityProgress(account) | number: '1.0-0' }}%
+            </span>
           </div>
           <mat-progress-bar
-            [color]="getProgressBarColor(account)"
             mode="determinate"
             [value]="calculateMaturityProgress(account)"
-          >
-          </mat-progress-bar>
+            [color]="getProgressBarColor(account)"
+          ></mat-progress-bar>
 
           <div class="remaining-days" *ngIf="getRemainingDays(account) > 0">
-            <span
-              >{{ getRemainingDays(account) }} days remaining until
-              tax-free</span
-            >
+            {{ getRemainingDays(account) }} days remaining until tax-free status
           </div>
           <div class="tax-free-notice" *ngIf="getRemainingDays(account) === 0">
-            <mat-icon color="accent">verified</mat-icon>
-            <span>Tax-free status achieved!</span>
+            <mat-icon>verified</mat-icon>
+            <span>
+              Tax-free status reached on
+              {{ formatDate(account.maturityDate) }}
+            </span>
           </div>
         </div>
       </mat-card-content>
 
       <mat-card-actions>
-        <button mat-button color="primary">
-          <mat-icon>visibility</mat-icon>
-          View Details
-        </button>
+        <button mat-button color="primary">View details</button>
       </mat-card-actions>
     </mat-card>
   </div>

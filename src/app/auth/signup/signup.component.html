@@ -9,29 +9,54 @@
   <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
 
   <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="signup-form">
-    <h2>Create Account</h2>
-
     <mat-form-field appearance="outline">
       <mat-label>First Name</mat-label>
-      <input matInput formControlName="firstName" required />
-      <mat-error *ngIf="signupForm.get('firstName')?.invalid">
-        First name is required
+      <input
+        matInput
+        formControlName="firstName"
+        placeholder="Enter your first name"
+        required
+      />
+      <mat-error *ngIf="signupForm.get('firstName')?.hasError('required')">
+        Please enter your first name
       </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Last Name</mat-label>
-      <input matInput formControlName="lastName" required />
-      <mat-error *ngIf="signupForm.get('lastName')?.invalid">
-        Last name is required
+      <input
+        matInput
+        formControlName="lastName"
+        placeholder="Enter your last name"
+        required
+      />
+      <mat-error *ngIf="signupForm.get('lastName')?.hasError('required')">
+        Please enter your last name
       </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Email</mat-label>
-      <input matInput type="email" formControlName="email" required />
-      <mat-error *ngIf="signupForm.get('email')?.invalid">
-        {{ getErrorMessage('email') }}
+      <input
+        matInput
+        type="email"
+        formControlName="email"
+        placeholder="Enter your email"
+        required
+      />
+      <mat-error *ngIf="signupForm.get('email')?.hasError('required')">
+        Please enter your email
+      </mat-error>
+      <mat-error *ngIf="signupForm.get('email')?.hasError('invalidFormat')">
+        Please enter a valid email address
+      </mat-error>
+      <mat-error *ngIf="signupForm.get('email')?.hasError('invalidDomain')">
+        Email domain must be one of:
+        {{
+          signupForm
+            .get('email')
+            ?.errors?.['invalidDomain']?.validDomains?.join(', ')
+        }}
       </mat-error>
     </mat-form-field>
 
@@ -41,6 +66,7 @@
         matInput
         [type]="hidePassword ? 'password' : 'text'"
         formControlName="password"
+        placeholder="Enter your password"
         required
       />
       <button
@@ -55,14 +81,34 @@
           hidePassword ? 'visibility_off' : 'visibility'
         }}</mat-icon>
       </button>
-      <mat-error *ngIf="signupForm.get('password')?.invalid">
-        {{ getErrorMessage('password') }}
+      <mat-error *ngIf="signupForm.get('password')?.hasError('required')">
+        Please enter your password
+      </mat-error>
+      <mat-error *ngIf="signupForm.get('password')?.hasError('minLength')">
+        Password must be at least
+        {{
+          signupForm.get('password')?.errors?.['minLength']?.required
+        }}
+        characters long
+      </mat-error>
+      <mat-error *ngIf="signupForm.get('password')?.hasError('upperCase')">
+        Password must contain at least
+        {{
+          signupForm.get('password')?.errors?.['upperCase']?.required
+        }}
+        uppercase letters
+      </mat-error>
+      <mat-error *ngIf="signupForm.get('password')?.hasError('number')">
+        Password must contain at least one number
+      </mat-error>
+      <mat-error *ngIf="signupForm.get('password')?.hasError('specialChar')">
+        Password must contain at least one special character
       </mat-error>
     </mat-form-field>
 
     <div class="form-actions">
       <button
-        mat-raised-button
+        mat-flat-button
         color="primary"
         type="submit"
         [disabled]="!signupForm.valid"

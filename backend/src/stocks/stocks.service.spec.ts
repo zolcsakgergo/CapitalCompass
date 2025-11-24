@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Logger, NotFoundException } from '@nestjs/common';
 import { StocksService, CreateStockDto } from './stocks.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { TwelveDataService } from '../twelve-data/twelve-data.service';
@@ -23,9 +22,9 @@ describe('StocksService', () => {
     shares: 10,
     dateAcquired: new Date('2023-01-01'),
     priceAtPurchase: 150.25,
-    currentPrice: 175.50,
+    currentPrice: 175.5,
     previousDayPrice: 170.25,
-    yearStartPrice: 140.00,
+    yearStartPrice: 140.0,
     lastPriceUpdate: new Date(),
     userId: 'user-123',
     createdAt: new Date(),
@@ -43,12 +42,12 @@ describe('StocksService', () => {
     user: {
       findUnique: jest.fn(),
     },
-  };
+  } as unknown as PrismaService;
 
   const mockTwelveDataService = {
     getPrices: jest.fn(),
     getPrice: jest.fn(),
-  };
+  } as unknown as TwelveDataService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -78,35 +77,37 @@ describe('StocksService', () => {
 
   describe('findAll', () => {
     it('should return empty array when no stocks found', async () => {
-      mockPrismaService.stock.findMany.mockResolvedValue([]);
+      (prismaService.stock.findMany as jest.Mock).mockResolvedValue([]);
 
       const result = await service.findAll('user-123');
 
       expect(result).toEqual([]);
-      expect(mockPrismaService.stock.findMany).toHaveBeenCalledWith({
+      expect(prismaService.stock.findMany).toHaveBeenCalledWith({
         where: { userId: 'user-123' },
       });
     });
 
     it('should return stocks with updated prices', async () => {
-      const mockStocks = [mockStock];
-      mockPrismaService.stock.findMany.mockResolvedValue(mockStocks);
-      mockTwelveDataService.getPrices.mockResolvedValue(
-        new Map([['AAPL', 175.50]])
+      (prismaService.stock.findMany as jest.Mock).mockResolvedValue([
+        mockStock,
+      ]);
+      (twelveDataService.getPrices as jest.Mock).mockResolvedValue(
+        new Map([['AAPL', 175.5]]),
       );
-      mockPrismaService.stock.update.mockResolvedValue(mockStock);
+      (prismaService.stock.update as jest.Mock).mockResolvedValue(mockStock);
 
       const result = await service.findAll('user-123');
 
       expect(result).toHaveLength(1);
-      expect(result[0].currentPrice).toBe(175.50);
-      expect(mockTwelveDataService.getPrices).toHaveBeenCalledWith(['AAPL']);
+      expect(result[0].currentPrice).toBe(175.5);
+      expect(twelveDataService.getPrices).toHaveBeenCalledWith(['AAPL']);
     });
 
     it('should handle price fetch errors gracefully', async () => {
-      const mockStocks = [mockStock];
-      mockPrismaService.stock.findMany.mockResolvedValue(mockStocks);
-      mockTwelveDataService.getPrices.mockResolvedValue(new Map());
+      (prismaService.stock.findMany as jest.Mock).mockResolvedValue([
+        mockStock,
+      ]);
+      (twelveDataService.getPrices as jest.Mock).mockResolvedValue(new Map());
 
       const result = await service.findAll('user-123');
 
@@ -116,14 +117,18 @@ describe('StocksService', () => {
     it('should calculate performance metrics correctly', async () => {
       const stockWithMetrics = {
         ...mockStock,
-        currentPrice: 180.00,
-        priceAtPurchase: 150.00,
+        currentPrice: 180.0,
+        priceAtPurchase: 150.0,
       };
-      mockPrismaService.stock.findMany.mockResolvedValue([stockWithMetrics]);
-      mockTwelveDataService.getPrices.mockResolvedValue(
-        new Map([['AAPL', 180.00]])
+      (prismaService.stock.findMany as jest.Mock).mockResolvedValue([
+        stockWithMetrics,
+      ]);
+      (twelveDataService.getPrices as jest.Mock).mockResolvedValue(
+        new Map([['AAPL', 180.0]]),
       );
-      mockPrismaService.stock.update.mockResolvedValue(stockWithMetrics);
+      (prismaService.stock.update as jest.Mock).mockResolvedValue(
+        stockWithMetrics,
+      );
 
       const result = await service.findAll('user-123');
 
@@ -144,34 +149,34 @@ describe('StocksService', () => {
     };
 
     it('should create stock with current price', async () => {
-      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
-      mockTwelveDataService.getPrice.mockResolvedValue(295.00);
-      mockPrismaService.stock.create.mockResolvedValue({
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (twelveDataService.getPrice as jest.Mock).mockResolvedValue(295.0);
+      (prismaService.stock.create as jest.Mock).mockResolvedValue({
         ...createStockDto,
         id: 'stock-456',
-        currentPrice: 295.00,
+        currentPrice: 295.0,
         lastPriceUpdate: new Date(),
       });
 
       const result = await service.create(createStockDto);
 
       expect(result).toBeDefined();
-      expect(mockTwelveDataService.getPrice).toHaveBeenCalledWith('MSFT');
-      expect(mockPrismaService.stock.create).toHaveBeenCalledWith({
+      expect(twelveDataService.getPrice).toHaveBeenCalledWith('MSFT');
+      expect(prismaService.stock.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           ...createStockDto,
-          currentPrice: 295.00,
+          currentPrice: 295.0,
           lastPriceUpdate: expect.any(Date),
         }),
       });
     });
 
     it('should create stock even without explicit user validation', async () => {
-      mockTwelveDataService.getPrice.mockResolvedValue(295.00);
-      mockPrismaService.stock.create.mockResolvedValue({
+      (twelveDataService.getPrice as jest.Mock).mockResolvedValue(295.0);
+      (prismaService.stock.create as jest.Mock).mockResolvedValue({
         ...createStockDto,
         id: 'stock-456',
-        currentPrice: 295.00,
+        currentPrice: 295.0,
         lastPriceUpdate: new Date(),
       });
 
@@ -180,7 +185,9 @@ describe('StocksService', () => {
     });
 
     it('should handle API errors during creation', async () => {
-      mockTwelveDataService.getPrice.mockRejectedValue(new Error('API Error'));
+      (twelveDataService.getPrice as jest.Mock).mockRejectedValue(
+        new Error('API Error'),
+      );
 
       await expect(service.create(createStockDto)).rejects.toThrow('API Error');
     });
@@ -188,30 +195,28 @@ describe('StocksService', () => {
 
   describe('delete', () => {
     it('should delete stock successfully', async () => {
-      mockPrismaService.stock.findFirst.mockResolvedValue(mockStock);
-      mockPrismaService.stock.delete.mockResolvedValue(mockStock);
+      (prismaService.stock.findFirst as jest.Mock).mockResolvedValue(mockStock);
+      (prismaService.stock.delete as jest.Mock).mockResolvedValue(mockStock);
 
       await service.delete('user-123', 'stock-123');
 
-      expect(mockPrismaService.stock.findFirst).toHaveBeenCalledWith({
+      expect(prismaService.stock.findFirst).toHaveBeenCalledWith({
         where: { id: 'stock-123', userId: 'user-123' },
       });
-      expect(mockPrismaService.stock.delete).toHaveBeenCalledWith({
+      expect(prismaService.stock.delete).toHaveBeenCalledWith({
         where: { id: 'stock-123' },
       });
     });
 
     it('should handle stock not found gracefully', async () => {
-      mockPrismaService.stock.findFirst.mockResolvedValue(null);
+      (prismaService.stock.findFirst as jest.Mock).mockResolvedValue(null);
 
       await service.delete('user-123', 'nonexistent-stock');
 
-      expect(mockPrismaService.stock.findFirst).toHaveBeenCalledWith({
+      expect(prismaService.stock.findFirst).toHaveBeenCalledWith({
         where: { id: 'nonexistent-stock', userId: 'user-123' },
       });
-      expect(mockPrismaService.stock.delete).not.toHaveBeenCalled();
+      expect(prismaService.stock.delete).not.toHaveBeenCalled();
     });
   });
-
-
 });

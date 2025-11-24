@@ -49,7 +49,6 @@ export class LoginComponent {
   }
 
   getErrorMessage(field: string): string {
-    console.log('itt vagyok');
     const control = this.loginForm.get(field);
     if (!control) return '';
 

@@ -60,7 +60,6 @@ export class AssetFormComponent implements OnInit {
     { value: 'REAL_ESTATE', label: 'Real Estate' },
     { value: 'OTHER', label: 'Other' },
   ];
-
   constructor(
     private fb: FormBuilder,
     private tbszService: TbszService,
@@ -68,10 +67,8 @@ export class AssetFormComponent implements OnInit {
     public dialogRef: MatDialogRef<AssetFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
   ) {
-    console.log('AssetFormComponent constructor called with data:', data);
     this.isEdit = data.isEdit;
     this.assetForm = this.createForm();
-    console.log('AssetFormComponent: Form created successfully');
   }
 
   ngOnInit(): void {

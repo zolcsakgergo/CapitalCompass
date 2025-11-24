@@ -46,16 +46,14 @@ export class TbszDashboardComponent implements OnInit {
   }
 
   loadAccounts(): void {
-    console.log('TBSZ Dashboard: Loading accounts...');
     this.loading = true;
     this.tbszService.getAccounts().subscribe({
       next: accounts => {
-        console.log('TBSZ Dashboard: Accounts loaded:', accounts);
         this.accounts = accounts;
         this.loading = false;
       },
       error: error => {
-        console.error('TBSZ Dashboard: Error loading TBSZ accounts', error);
+        console.error('Error loading TBSZ accounts', error);
         this.loading = false;
       },
     });
@@ -66,33 +64,21 @@ export class TbszDashboardComponent implements OnInit {
   }
 
   openCreateAccountDialog(): void {
-    console.log('Opening create account dialog...');
-    try {
-      const dialogRef = this.dialog.open(TbszFormComponent, {
-        width: '500px',
-        maxWidth: '90vw',
-        height: 'auto',
-        maxHeight: '90vh',
-        disableClose: false,
-        autoFocus: true,
-        data: { isEdit: false },
-      });
+    const dialogRef = this.dialog.open(TbszFormComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      disableClose: false,
+      autoFocus: true,
+      data: { isEdit: false },
+    });
 
-      console.log('Dialog reference created:', dialogRef);
-
-      dialogRef.afterOpened().subscribe(() => {
-        console.log('Dialog opened successfully');
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        console.log('Dialog closed with result:', result);
-        if (result) {
-          this.loadAccounts();
-        }
-      });
-    } catch (error) {
-      console.error('Error opening dialog:', error);
-    }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadAccounts();
+      }
+    });
   }
 
   openEditAccountDialog(account: TbszAccount, event: Event): void {
@@ -131,30 +117,43 @@ export class TbszDashboardComponent implements OnInit {
     return this.tbszService.calculateRemainingDays(account);
   }
 
-  getAccountStatusClass(account: TbszAccount): string {
-    switch (account.status) {
-      case 'ACTIVE':
-        return 'status-active';
-      case 'MATURED':
-        return 'status-matured';
-      case 'CLOSED':
-        return 'status-closed';
-      case 'WITHDRAWN':
-        return 'status-withdrawn';
-      default:
-        return '';
+  calculateTaxLiability(account: TbszAccount): number {
+    const totalValue =
+      account.assets?.reduce((sum, asset) => sum + asset.currentValue, 0) || 0;
+    const gain = totalValue - account.initialDepositAmount;
+    if (gain <= 0) {
+      return 0;
     }
+    const taxRate = 0.15;
+    return gain * taxRate;
+  }
+
+  getAccountStatusClass(account: TbszAccount): string {
+    const status = account.status?.toUpperCase();
+    if (status === 'ACTIVE') {
+      return 'status-badge status-active';
+    }
+    if (status === 'MATURED') {
+      return 'status-badge status-matured';
+    }
+    if (status === 'CLOSED') {
+      return 'status-badge status-closed';
+    }
+    if (status === 'WITHDRAWN') {
+      return 'status-badge status-withdrawn';
+    }
+    return 'status-badge';
   }
 
   getProgressBarColor(account: TbszAccount): string {
     const progress = this.calculateMaturityProgress(account);
     if (progress >= 100) {
-      return 'accent'; // Matured
-    } else if (progress >= 75) {
-      return 'primary'; // Almost there
-    } else {
-      return 'warn'; // Still a long way to go
+      return 'primary';
     }
+    if (progress >= 75) {
+      return 'accent';
+    }
+    return 'warn';
   }
 
   formatCurrency(amount: number): string {

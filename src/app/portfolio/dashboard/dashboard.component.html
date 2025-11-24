@@ -69,33 +69,77 @@
     </mat-card>
   </div>
 
-  <div class="chart-section">
+  <div class="chart-section allocation-chart">
     <mat-card>
       <mat-card-header>
-        <mat-card-title>Portfolio Visualization</mat-card-title>
+        <mat-card-title>Portfolio Allocation</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="chart-container">
           <canvas
             appPortfolioChart
-            [chartType]="selectedChartType"
-            [chartData]="chartData"
-            [chartOptions]="chartOptions"
+            [chartType]="'pie'"
+            [chartData]="allocationChartData"
+            [chartOptions]="allocationChartOptions"
           >
           </canvas>
         </div>
-        <div class="chart-controls">
-          <mat-form-field appearance="outline">
-            <mat-label>Chart Type</mat-label>
-            <mat-select
-              [(ngModel)]="selectedChartType"
-              (selectionChange)="updateChart()"
-            >
-              <mat-option value="pie">Pie Chart</mat-option>
-              <mat-option value="bar">Bar Chart</mat-option>
-              <mat-option value="line">Line Chart</mat-option>
-            </mat-select>
-          </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="chart-section growth-chart">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Capital Growth</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <canvas
+            appPortfolioChart
+            [chartType]="'line'"
+            [chartData]="growthChartData"
+            [chartOptions]="growthChartOptions"
+          >
+          </canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="chart-section gains-chart">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Gains & Losses by Asset</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <canvas
+            appPortfolioChart
+            [chartType]="'bar'"
+            [chartData]="gainsChartData"
+            [chartOptions]="gainsChartOptions"
+          >
+          </canvas>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="chart-section performance-chart">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Performance Comparison</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="chart-container">
+          <canvas
+            appPortfolioChart
+            [chartType]="'bar'"
+            [chartData]="performanceChartData"
+            [chartOptions]="performanceChartOptions"
+          >
+          </canvas>
         </div>
       </mat-card-content>
     </mat-card>

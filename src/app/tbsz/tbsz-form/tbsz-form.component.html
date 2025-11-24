@@ -80,7 +80,11 @@
     color="primary"
     [disabled]="tbszForm.invalid || loading"
     (click)="onSubmit()"
+    #submitButton
   >
-    {{ isEdit ? 'Save Changes' : 'Create Account' }}
+    <span *ngIf="!loading">{{
+      isEdit ? 'Save Changes' : 'Create Account'
+    }}</span>
+    <span *ngIf="loading">Saving...</span>
   </button>
 </mat-dialog-actions>

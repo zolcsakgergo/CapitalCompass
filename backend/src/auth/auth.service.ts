@@ -87,8 +87,8 @@ export class AuthService {
     this.logger.debug('User registered successfully');
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash: pwd, ...result } = user;
-    return result;
+    const { passwordHash, ...result } = user;
+    return this.login(result);
   }
 
   async getProfile(userId: string) {

@@ -38,29 +38,22 @@ export class AuthService {
   ) {
     const token = localStorage.getItem('token');
     const userId = localStorage.getItem('userId');
+
     if (token && userId) {
-      console.log('Found stored token, validating...');
-      this.validateToken(token).subscribe({
-        next: () => {
-          console.log('Token validated successfully');
-          this.tokenSubject.next(token);
-          this.userIdSubject.next(userId);
-        },
-        error: error => {
-          console.error('Token validation failed:', error);
-          this.clearAuth();
-        },
-      });
+      this.tokenSubject.next(token);
+      this.userIdSubject.next(userId);
+      // NOTE: Do not call getUserProfile() here to avoid triggering
+      // HTTP + interceptors + router during construction, which can
+      // create DI cycles. Instead, components can call getUserProfile()
+      // after app bootstrap if needed.
     }
   }
 
   signup(userData: SignupData): Observable<AuthResponse> {
-    console.log('Attempting signup...');
     return this.http
       .post<AuthResponse>(`${this.API_URL}/register`, userData)
       .pipe(
         tap(response => {
-          console.log('Signup successful');
           this.setAuth(response);
           this.router.navigate(['/portfolio']);
         }),
@@ -69,12 +62,10 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
-    console.log('Attempting login...');
     return this.http
       .post<AuthResponse>(`${this.API_URL}/login`, { email, password })
       .pipe(
         tap(response => {
-          console.log('Login successful');
           this.setAuth(response);
           this.router.navigate(['/portfolio']);
         }),
@@ -83,50 +74,31 @@ export class AuthService {
   }
 
   logout() {
-    console.log('Logging out...');
     this.clearAuth();
   }
 
   private setAuth(response: AuthResponse) {
-    console.log('Setting auth state...');
     if (!response.access_token || !response.user) {
-      console.error('Invalid auth response:', response);
       throw new Error('Invalid authentication response');
     }
     this.tokenSubject.next(response.access_token);
     this.userIdSubject.next(response.user.id || response.user.email);
     localStorage.setItem('token', response.access_token);
     localStorage.setItem('userId', response.user.id || response.user.email);
-    console.log('Auth state set successfully');
   }
 
-  private clearAuth() {
-    console.log('Clearing auth state...');
+  private clearAuth(redirect: boolean = true) {
     this.tokenSubject.next(null);
     this.userIdSubject.next(null);
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
-    this.router.navigate(['/login']);
-  }
-
-  private validateToken(token: string): Observable<any> {
-    console.log('Validating token...');
-    return this.http.get(`${this.API_URL}/validate-token`).pipe(
-      tap(() => console.log('Token validation request successful')),
-      catchError((error: HttpErrorResponse) => {
-        console.error('Token validation failed:', error);
-        if (error.status === 401) {
-          this.clearAuth();
-        }
-        return throwError(() => error);
-      }),
-    );
+    if (redirect) {
+      this.router.navigate(['/login']);
+    }
   }
 
   getToken(): string | null {
-    const token = this.tokenSubject.value;
-    console.log('Getting token:', token ? 'Token exists' : 'No token');
-    return token;
+    return this.tokenSubject.value;
   }
 
   getUserId(): string | null {
@@ -134,17 +106,12 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    const isAuth = !!this.tokenSubject.value;
-    console.log('Checking authentication:', isAuth);
-    return isAuth;
+    return !!this.tokenSubject.value;
   }
 
   getUserProfile(): Observable<any> {
-    console.log('Fetching user profile...');
     return this.http.get(`${this.API_URL}/profile`).pipe(
-      tap(profile => console.log('Profile fetched successfully:', profile)),
       catchError((error: HttpErrorResponse) => {
-        console.error('Error fetching profile:', error);
         if (error.status === 401) {
           this.clearAuth();
         }
@@ -154,14 +121,11 @@ export class AuthService {
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
-    console.error('API Error:', error);
     let errorMessage = 'An unknown error occurred!';
 
     if (error.error instanceof ErrorEvent) {
-      console.error('Client Error:', error.error.message);
       errorMessage = error.error.message;
     } else {
-      console.error('Server Error:', error.status, error.error);
       if (error.status === 401) {
         this.clearAuth();
         errorMessage = 'Authentication failed. Please log in again.';

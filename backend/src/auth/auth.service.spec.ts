@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UnauthorizedException, Logger } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
@@ -11,9 +11,6 @@ const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 
 describe('AuthService', () => {
   let service: AuthService;
-  let prismaService: PrismaService;
-  let jwtService: JwtService;
-  let usersService: UsersService;
 
   const mockUser = {
     id: 'user-123',
@@ -61,9 +58,6 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    prismaService = module.get<PrismaService>(PrismaService);
-    jwtService = module.get<JwtService>(JwtService);
-    usersService = module.get<UsersService>(UsersService);
 
     jest.clearAllMocks();
   });
@@ -77,7 +71,10 @@ describe('AuthService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
       mockBcrypt.compare.mockResolvedValue(true as never);
 
-      const result = await service.validateUser('test@example.com', 'password123');
+      const result = await service.validateUser(
+        'test@example.com',
+        'password123',
+      );
 
       expect(result).toEqual({
         id: 'user-123',
@@ -93,14 +90,17 @@ describe('AuthService', () => {
       });
       expect(mockBcrypt.compare).toHaveBeenCalledWith(
         'password123',
-        '$2b$10$hashedpassword'
+        '$2b$10$hashedpassword',
       );
     });
 
     it('should return null when user not found', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      const result = await service.validateUser('nonexistent@example.com', 'password123');
+      const result = await service.validateUser(
+        'nonexistent@example.com',
+        'password123',
+      );
 
       expect(result).toBeNull();
       expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({
@@ -113,12 +113,15 @@ describe('AuthService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
       mockBcrypt.compare.mockResolvedValue(false as never);
 
-      const result = await service.validateUser('test@example.com', 'wrongpassword');
+      const result = await service.validateUser(
+        'test@example.com',
+        'wrongpassword',
+      );
 
       expect(result).toBeNull();
       expect(mockBcrypt.compare).toHaveBeenCalledWith(
         'wrongpassword',
-        '$2b$10$hashedpassword'
+        '$2b$10$hashedpassword',
       );
     });
   });
@@ -148,15 +151,13 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException when user is null', async () => {
-      await expect(service.login(null)).rejects.toThrow(
-        UnauthorizedException
-      );
+      await expect(service.login(null)).rejects.toThrow(UnauthorizedException);
       expect(mockJwtService.sign).not.toHaveBeenCalled();
     });
 
     it('should throw UnauthorizedException when user is undefined', async () => {
       await expect(service.login(undefined)).rejects.toThrow(
-        UnauthorizedException
+        UnauthorizedException,
       );
       expect(mockJwtService.sign).not.toHaveBeenCalled();
     });
@@ -183,23 +184,26 @@ describe('AuthService', () => {
       };
       mockPrismaService.user.create.mockResolvedValue(newUser);
 
+      const mockToken = 'jwt-token-123';
+      mockJwtService.sign.mockReturnValue(mockToken);
+
       const result = await service.register(
         registerData.email,
         registerData.password,
         registerData.firstName,
-        registerData.lastName
+        registerData.lastName,
       );
 
       expect(result).toEqual({
-        id: 'user-456',
-        email: 'newuser@example.com',
-        firstName: 'New',
-        lastName: 'User',
-        isActive: true,
-        createdAt: newUser.createdAt,
-        updatedAt: newUser.updatedAt,
-        password: 'password123',
+        access_token: mockToken,
+        user: {
+          id: 'user-456',
+          email: 'newuser@example.com',
+          firstName: 'New',
+          lastName: 'User',
+        },
       });
+
       expect(mockBcrypt.hash).toHaveBeenCalledWith('password123', 10);
       expect(mockPrismaService.user.create).toHaveBeenCalledWith({
         data: {
@@ -219,8 +223,8 @@ describe('AuthService', () => {
           registerData.email,
           registerData.password,
           registerData.firstName,
-          registerData.lastName
-        )
+          registerData.lastName,
+        ),
       ).rejects.toThrow(UnauthorizedException);
 
       expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({

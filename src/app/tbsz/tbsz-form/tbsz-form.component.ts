@@ -61,15 +61,11 @@ export class TbszFormComponent implements OnInit {
     public dialogRef: MatDialogRef<TbszFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
   ) {
-    console.log('TbszFormComponent constructor called with data:', data);
-    console.log('TbszFormComponent: Creating form...');
     this.isEdit = data.isEdit;
     this.tbszForm = this.createForm();
-    console.log('TbszFormComponent: Form created successfully');
   }
 
   ngOnInit(): void {
-    console.log('TbszFormComponent ngOnInit called');
     if (this.isEdit && this.data.account) {
       this.tbszForm.patchValue({
         name: this.data.account.name,
