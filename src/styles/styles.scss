@@ -2,7 +2,6 @@
 @use 'variables' as vars;
 @use 'mixins' as mix;
 
-// Global styles
 html,
 body {
   height: 100%;
@@ -22,14 +21,12 @@ body {
   overflow-y: auto;
 }
 
-// Core layout classes
 .container {
   padding: vars.$spacing-md;
   max-width: vars.$breakpoint-lg;
   margin: 0 auto;
 }
 
-// Typography
 h2 {
   text-align: center;
   font-size: vars.$font-size-xl;
@@ -45,7 +42,6 @@ h3 {
   font-weight: vars.$font-weight-medium;
 }
 
-// Common utility classes
 .flex-center {
   @include mix.flex-center;
 }
@@ -58,7 +54,6 @@ h3 {
   @include mix.flex-column;
 }
 
-// Status indicators
 .positive {
   color: vars.$success;
 }
@@ -72,8 +67,6 @@ h3 {
   color: vars.$info;
 }
 
-// Global Material Styles
-// Form Fields
 .mat-mdc-form-field {
   width: 100%;
   margin-bottom: vars.$spacing-md;
@@ -91,7 +84,6 @@ h3 {
   }
 }
 
-// Buttons
 .mat-mdc-button,
 .mat-mdc-raised-button,
 .mat-mdc-flat-button,
@@ -106,7 +98,6 @@ h3 {
   }
 }
 
-// Cards
 .mat-mdc-card.mat-mdc-card {
   border-radius: vars.$border-radius-lg;
   box-shadow: vars.$shadow-sm;
@@ -121,7 +112,6 @@ h3 {
   }
 }
 
-// Tables
 .mat-mdc-table {
   width: 100%;
   margin-bottom: vars.$spacing-lg;
@@ -141,7 +131,6 @@ h3 {
   }
 }
 
-// Dialog
 .mat-mdc-dialog-container.mdc-dialog__container {
   .mdc-dialog__surface {
     padding: vars.$spacing-xl;
@@ -161,7 +150,6 @@ h3 {
   }
 }
 
-// Ensure dialog overlay is visible
 .cdk-overlay-pane {
   z-index: 1000 !important;
 }
@@ -170,7 +158,6 @@ h3 {
   z-index: 999 !important;
 }
 
-// Additional dialog visibility fixes
 .mat-mdc-dialog-container {
   z-index: 1001 !important;
 }
@@ -179,13 +166,11 @@ h3 {
   z-index: 1000 !important;
 }
 
-// Ensure dialog content is visible
 .mat-mdc-dialog-content {
   max-height: 70vh !important;
   overflow-y: auto !important;
 }
 
-// Sidenav
 .mat-drawer {
   width: 250px;
   background-color: vars.$background;
@@ -193,14 +178,12 @@ h3 {
   box-shadow: vars.$shadow-md;
 }
 
-// Toolbar
 .mat-toolbar {
   background: vars.$background;
   color: vars.$text-primary;
   box-shadow: vars.$shadow-sm;
 }
 
-// Responsive adjustments
 @include mix.respond-to(sm) {
   .container {
     padding: vars.$spacing-sm;

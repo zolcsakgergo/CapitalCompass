@@ -42,10 +42,6 @@ export class AuthService {
     if (token && userId) {
       this.tokenSubject.next(token);
       this.userIdSubject.next(userId);
-      // NOTE: Do not call getUserProfile() here to avoid triggering
-      // HTTP + interceptors + router during construction, which can
-      // create DI cycles. Instead, components can call getUserProfile()
-      // after app bootstrap if needed.
     }
   }
 

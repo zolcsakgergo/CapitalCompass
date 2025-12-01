@@ -66,8 +66,8 @@ model Stock {
 
 model Transaction {
   id              String   @id @default(uuid())
-  assetType       String   // 'STOCK' or 'CRYPTO'
-  transactionType String   // 'BUY' or 'SELL'
+  assetType       String   
+  transactionType String   
   name            String
   symbol          String
   amount          Decimal  @db.Decimal(10, 8)
@@ -116,7 +116,7 @@ model TbszAccount {
   name                String
   openingDate         DateTime
   maturityDate        DateTime
-  status              String    @default("ACTIVE") // ACTIVE, MATURED, CLOSED, WITHDRAWN
+  status              String    @default("ACTIVE") 
   initialDepositAmount Decimal   @db.Decimal(10, 2)
   userId              String
   user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
